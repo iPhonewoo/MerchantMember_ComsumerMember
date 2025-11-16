@@ -1,0 +1,122 @@
+GET http://127.0.0.1:8000/store/products/ HTTP/1.1
+
+###
+
+GET http://127.0.0.1:8000/store/products/2/ HTTP/1.1
+
+###
+
+DELETE http://127.0.0.1:8000/store/products/2/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "商品",
+    "description": "This is a new product.",
+    "price": 1500.00,
+    "stock": 200
+}
+
+###
+
+PUT http://127.0.0.1:8000/store/products/2/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYwNjA3MTQ5LCJpYXQiOjE3NjA2MDY4NDksImp0aSI6IjNiNmQzZDNkNDNiNjQ3NGE5MjIxOTYwN2ViY2JmM2MwIiwidXNlcl9pZCI6IjEifQ.rqWKAHXzNqMyQIIc0HRGzwsNp6XnJnC3jUBQ3O3mMOI
+
+{
+    "name": "商品",
+    "description": "This is a new product.",
+    "price": 1500.00,
+    "stock": 200
+}
+
+###
+
+POST  http://127.0.0.1:8000/store/products/ HTTP/1.1
+Content-Type: application/json
+Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYwNjAxMDcxLCJpYXQiOjE3NjA2MDA3NzEsImp0aSI6IjNkMTk5MTdhMzJiODQ3ZTFhMGZhOGUwOGMyYjFmZDUyIiwidXNlcl9pZCI6IjIifQ.Tkxv5000uN-U3w6yyQS3cZtO4YEnPmq8rN6vzYAWSr0
+
+{
+    "name": "New Product",
+    "description": "This is a new product.",
+    "price": 29.99,
+    "stock": 100
+}
+
+###
+
+POST  http://127.0.0.1:8000/api/token/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "test"
+}
+
+###
+
+POST  http://127.0.0.1:8000/api/token/refresh/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "refresh" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2MDY4ODg4MSwiaWF0IjoxNzYwNjAyNDgxLCJqdGkiOiI2OTRiNGYyMTFlOGY0ZjY3YWU0M2YwNDU3MzFjOWM1ZSIsInVzZXJfaWQiOiIxIn0.Z3eH2nTHODcNr9Wf3xbaZ4IsuXzJOT121aVkzKqsOjg"
+}
+
+###
+
+GET http://127.0.0.1:8000/store/user-orders/ HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYwNjAyODA5LCJpYXQiOjE3NjA2MDI1MDksImp0aSI6IjNhMTRhNGVmODEyMTQ4NzJiODRjNTJiMjYyNjcyYjFkIiwidXNlcl9pZCI6IjEifQ.CtYQ-sfVvypq3HkuvKZTi1FCR8uuMXbHQtJv1evdqj8
+
+###
+
+GET http://127.0.0.1:8000/store/orders/ HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYwNzY1MTM3LCJpYXQiOjE3NjA3NjQ4MzcsImp0aSI6IjJlN2M2YzhlMDhhOTQ5NmY5ODBiNDVmYzM5MjQwM2Y5IiwidXNlcl9pZCI6IjIifQ.SwAtgVlgciAWYw72dL3LP3Lll9AAvdqEuYgzRYxxOaw
+
+###
+
+GET http://127.0.0.1:8000/store/orders/8/ HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYwNzg1ODUxLCJpYXQiOjE3NjA3ODU1NTEsImp0aSI6IjAyYzU4ZTc3OTQyZDQxZThhMzk1Y2IwODE5ZGYzNmY4IiwidXNlcl9pZCI6IjEifQ.lWusduoxeTsNAtdPcPysiNBUGGGA-P-09DsjPhb5qjw
+
+###
+
+POST  http://127.0.0.1:8000/store/orders/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYwNzgyNzEzLCJpYXQiOjE3NjA3ODI0MTMsImp0aSI6IjdjMmE4YjcyNzg1ODRmYzVhMWZkNjExNWM0ZTE1YzdiIiwidXNlcl9pZCI6IjEifQ.xfeTsPupPrJ0UTbexg1YypAh55LzpXMgDGao8Hj4Hhc
+
+{
+    "status": "Confirmed",
+    "items": [
+        {
+            "product": 2,
+            "quantity": 2
+        },
+        {
+            "product": 3,
+            "quantity": 1
+        }
+    ]
+}
+
+###
+
+PUT  http://127.0.0.1:8000/store/orders/8/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYwNzg2MjY3LCJpYXQiOjE3NjA3ODU5NjcsImp0aSI6IjYyODFiNjBkNDQ0NDQ4OTFiYThiMGVhMDBjMzY3MDVkIiwidXNlcl9pZCI6IjEifQ.qUd-0edGBb16AxAO3ls6r4xGgExTueAcjudM99WgKkg
+
+{
+    "status": "Confirmed",
+    "items": [
+        {
+            "product": 5,
+            "quantity": 5
+        },
+        {
+            "product": 3,
+            "quantity": 1
+        }
+    ]
+}
+
+###
+
+DELETE   http://127.0.0.1:8000/store/orders/9/ HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxNjQwMDQ1LCJpYXQiOjE3NjE2Mzk3NDUsImp0aSI6IjdlNWI4NWU3ODIxYTRjNTE4ZWYwMzcwMjcwZmU4YTNlIiwidXNlcl9pZCI6IjEifQ.3Ae4Yz3BEyHvbZKzkCXVSxUr22QGKSfLFfGelA2S0lk
