@@ -1,5 +1,6 @@
 from django.contrib import admin
-from store.models import Order, OrderItem, User
+from store.models import Order, OrderItem
+from member.models import User
 
 # Register your models here.
 

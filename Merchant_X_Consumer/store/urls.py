@@ -14,5 +14,5 @@ urlpatterns = [
 ]
 
 router = DefaultRouter()
-router.register('orders', store_views.orderViewSet, basename='order')
+router.register('orders', store_views.orderViewSet, basename='order') # 註冊Order的ViewSet到路由系統
 urlpatterns += router.urls

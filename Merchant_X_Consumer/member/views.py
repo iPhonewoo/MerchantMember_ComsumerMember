@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 # 匯入 member 資料庫
-from member.models import Member
+from member.models import User, Member
 # 匯入加密及驗證密碼的功能
 from django.contrib.auth.hashers import make_password, check_password
 # 找到檔案上傳的路徑
@@ -11,7 +11,7 @@ from datetime import datetime
 # serializer 測試
 from django.shortcuts import get_object_or_404 
 from django.http import JsonResponse
-from member.serializers import MemberSerializer
+from member.serializers import RegisterSerializer, MemberSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import generics
@@ -20,6 +20,12 @@ from rest_framework.permissions import IsAdminUser  # 確保只有管理員用�
 from rest_framework.permissions import IsAuthenticated  # 確保只有已驗證的用戶可以存取這些API
 
 # Create your views here.
+
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = RegisterSerializer
+
+    
 
 class MemberListCreateAPIView(generics.ListCreateAPIView):
     queryset = Member.objects.order_by('pk') # 取得所有產品

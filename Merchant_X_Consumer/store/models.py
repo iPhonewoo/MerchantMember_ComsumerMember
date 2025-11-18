@@ -2,12 +2,14 @@ import uuid
 from django.db import models
 from datetime import datetime
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
+
 
 
 # Create your models here.
 
-class User(AbstractUser):
-    pass
+# class User(AbstractUser):
+    # pass
     # user_id = models.AutoField(primary_key=True)
     # user_name = models.CharField(max_length=20)
     # user_email = models.EmailField(max_length=200, unique=True)
@@ -45,7 +47,7 @@ class Order(models.Model):
         CANCELED = 'Canceled'
 
     order_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey('member.User', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
         max_length=10,
