@@ -120,3 +120,49 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
 
 DELETE   http://127.0.0.1:8000/store/orders/9/ HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxNjQwMDQ1LCJpYXQiOjE3NjE2Mzk3NDUsImp0aSI6IjdlNWI4NWU3ODIxYTRjNTE4ZWYwMzcwMjcwZmU4YTNlIiwidXNlcl9pZCI6IjEifQ.3Ae4Yz3BEyHvbZKzkCXVSxUr22QGKSfLFfGelA2S0lk
+
+###
+
+POST  http://127.0.0.1:8000/member/login/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "username": "tie",
+    "password": "123"
+}
+
+###
+
+PUT http://127.0.0.1:8000/store/stores/1/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0MTQ3ODc4LCJpYXQiOjE3NjQxNDc1NzgsImp0aSI6ImY2YWVhYzY4ODgxZjQwYmVhYWExODgwYzYyYmRjMzhlIiwidXNlcl9pZCI6IjEiLCJyb2xlIjoibWVyY2hhbnQifQ.vQtuveYdyi8nKWVJ8DJK6JTCGaMGZRw4xc0XLcKsYlM
+
+{
+    "store_name": "帶帶黑狗的店",
+    "store_description": "這是一家黑狗帶帶很愛的店喔！"
+
+}
+
+###
+POST http://127.0.0.1:8000/store/products/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0MTQ5MTgxLCJpYXQiOjE3NjQxNDg4ODEsImp0aSI6ImI5NWNjMjIyYWZkYjQzOWE5NDYzY2Y5ZGI2OGVhNTAwIiwidXNlcl9pZCI6IjciLCJyb2xlIjoibWVyY2hhbnQifQ.XHoh0ZaYjGDeCvfhG5ZcNvbuXldqzwc0qqnSo1YqyUk
+
+{
+    "name": "新鮮潔牙骨",
+    "description": "領帶愛吃的潔牙骨",
+    "price": 9.99,
+    "stock": 35
+}
+
+###
+PUT http://127.0.0.1:8000/store/products/3/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0MTQ3MDM3LCJpYXQiOjE3NjQxNDY3MzcsImp0aSI6IjkxYzkzYTcwNzkxODQ4ZGE5Y2RlMDRjOWRhZjM1NDc2IiwidXNlcl9pZCI6IjciLCJyb2xlIjoibWVyY2hhbnQifQ.AyBEkhKQtCZ5omU3JXbXxCJHqM1OD0J_7G2RApGbIPk
+
+{
+    "name": "難吃的狗糧",
+    "description": "領帶不愛吃的狗糧",
+    "price": 1.99,
+    "stock": 5000
+}

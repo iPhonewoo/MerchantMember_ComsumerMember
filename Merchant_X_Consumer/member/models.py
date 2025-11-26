@@ -21,7 +21,7 @@ class Member(models.Model):
     member_birth = models.DateField(null=True, blank=True)
     member_avatar = models.CharField(max_length=100, default='empty.png')
     last_update = models.DateTimeField(default=datetime.now(), editable=False)
-    member_points = models.IntegerField(default=0, editable=False)
+    member_points = models.IntegerField(default=50, editable=False)
     login_days = models.IntegerField(default=0, editable=False)
     last_loginDate = models.DateTimeField(default=datetime.now(), editable=False)
 
@@ -34,14 +34,12 @@ class Member(models.Model):
 
 class Merchant(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
-    store_name = models.CharField(max_length=100, null=True, blank=True)
+    merchant_name = models.CharField(max_length=50)
     merchant_password = models.CharField(max_length=128)
     merchant_email = models.EmailField(max_length=200, unique=True)
-    merchant_birth = models.DateField()
+    merchant_birth = models.DateField(null=True, blank=True)
     merchant_avatar = models.CharField(max_length=100, default='empty.png')
-    last_update = models.DateTimeField(default=datetime.now(), editable=False)
-    login_days = models.IntegerField(default=0, editable=False)
-    last_loginDate = models.DateTimeField(default=datetime.now(), editable=False)
+    
 
     class Meta:
         db_table = 'merchant' # 指定資料表名稱

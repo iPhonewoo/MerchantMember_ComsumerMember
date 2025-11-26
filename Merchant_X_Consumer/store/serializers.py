@@ -1,20 +1,40 @@
 from django.db import transaction # 用於資料庫交易管理
 from rest_framework import serializers
-from store.models import Product, Order, OrderItem
+from store.models import Store, Product, Order, OrderItem
+from datetime import datetime
+
+
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    store_name = serializers.CharField(source='store.store_name', read_only=True) # 取得關聯的Store名稱
     class Meta:
         model = Product
-        fields = ['description', 'name', 'price', 'stock']
+        fields = ['description', 'name', 'price', 'stock', 'store_name']
 
     def validate_price(self, value): 
         if value < 0:
             raise serializers.ValidationError(
                 "價格不能為負數"
             )   
-        return value 
-    
+        return value
+
+
+class StoreSerializer(serializers.ModelSerializer):
+    products = ProductSerializer(many=True, read_only=True) # 取得關聯的產品列表
+    class Meta:
+        model = Store
+        fields = [
+            'store_id',
+            'user', 
+            'store_name', 
+            'store_description',  
+            'last_update',
+            'products', 
+        ] 
+        read_only_fields = ["user", "created_at"] # 這些欄位為唯讀
+
+
 class OrderItemSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source='product.name') # 取得關聯的Product名稱
     product_price = serializers.DecimalField(source='product.price', max_digits=10, decimal_places=2) # 取得關聯的Product價格

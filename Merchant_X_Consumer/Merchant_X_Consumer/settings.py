@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework", 
-    "drf_spectacular", 
+    "drf_spectacular",
+    "drf_spectacular_sidecar", 
     "django_filters", 
 
     # 自己的app
@@ -143,9 +144,10 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Your Project API',
-    'DESCRIPTION': 'Your project description',
+    'TITLE': 'Merchant X Consumer API',
+    'DESCRIPTION': '商家/會員/商品管理系統 API 文件',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS
 }
+

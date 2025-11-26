@@ -10,6 +10,7 @@ from rest_framework.decorators import \
     api_view  # 使用Django REST framework的api_view裝飾器
 from rest_framework.pagination import (LimitOffsetPagination,  # 分頁類別
                                        PageNumberPagination)
+from rest_framework.permissions import IsAuthenticatedOrReadOnly # 確保只有已驗證的用戶可以存取這些API
 from rest_framework.permissions import AllowAny  # 允許任何人存取這些API
 from rest_framework.permissions import IsAdminUser  # 確保只有管理員用戶可以存取這些API
 from rest_framework.permissions import IsAuthenticated  # 確保只有已驗證的用戶可以存取這些API
@@ -18,11 +19,35 @@ from rest_framework.views import APIView  # 基本的API視圖類別
 
 from store.filter import (InStockFilterBackend, OrderFilter,  # 自定義的過濾器
                           ProductFilter)
-from store.models import Order, OrderItem, Product
-from store.serializers import (OrderSerializer, ProductInfoSerializer,
+from store.models import Store, Order, OrderItem, Product
+from store.serializers import (StoreSerializer, OrderSerializer, ProductInfoSerializer,
                                ProductSerializer, OrderCreateSerializer)
+from member.permissions import IsMerchant
+from rest_framework.exceptions import PermissionDenied # 用於權限拒絕例外
+from datetime import datetime
 
 # Create your views here.
+class StoreDetailAPIView(generics.RetrieveUpdateDestroyAPIView): 
+    serializer_class = StoreSerializer # 使用StoreSerializer將Store物件轉換成JSON格式
+    
+    def get_permissions(self):
+        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
+           return [IsMerchant()] # 只有自己的商店可以修改
+        return [IsAuthenticatedOrReadOnly()] # 其他人只能查看商店詳情
+
+    def get_queryset(self):
+        if self.request.method == 'GET':
+            return Store.objects.all() # 任何人都可以查看商店詳情
+        if not self.request.user.is_authenticated:
+            return Store.objects.none() # 未驗證用戶無法查看商店資料
+        return Store.objects.filter(user=self.request.user) # 取得該商戶的商店資料
+    
+    def perform_update(self, serializer):
+        store = serializer.save() # 儲存更新的商店資料
+        store.last_update = datetime.now()
+        store.save() # 更新商店的最後更新時間
+    
+
 
 class ProductListCreateAPIView(generics.ListCreateAPIView):
     queryset = Product.objects.order_by('pk') # 取得所有產品
@@ -42,21 +67,55 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
     pagination_class.max_page_size = 4 # 每頁最多顯示十個產品
 
     def get_permissions(self):
-        self.permission_classes = [AllowAny] # 任何人都可以查看產品列表
         if self.request.method == 'POST':
-            self.permission_classes = [IsAdminUser] # 只有管理員用戶可以新增產品
-        return super().get_permissions()
+           return [IsMerchant()] # 只有商戶可以新增產品
+        return [AllowAny()] # 任何人都可以查看產品列表
+        # self.permission_classes = [AllowAny] # 任何人都可以查看產品列表
+        # if self.request.method == 'POST':
+        #     self.permission_classes = [IsMerchant] # 只有商戶可以新增產品
+        # return super().get_permissions()
+   
+    def perform_create(self, serializer):
+        user = self.request.user
+        if not user.is_authenticated:
+            raise PermissionDenied("請先登入") # 確保使用者已驗證
+        
+        try:
+            store = Store.objects.get(user=user)
+        except Store.DoesNotExist:
+            raise PermissionDenied("您尚未創建商店哦！") # 確保商戶有商店
+        
+        product = serializer.save(store=store) # 將產品與商店關聯起來並儲存
 
+        store.last_update = datetime.now()
+        store.save() # 更新商店的最後更新時間
+        return product
+        
+    
 class ProductDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all() # 取得所有產品
     serializer_class = ProductSerializer # 使用ProductSerializer將Product物件轉換成JSON格式
 
     def get_permissions(self):
-        self.permission_classes = [AllowAny] # 任何人都可以查看產品詳情
         if self.request.method in ['PUT', 'PATCH', 'DELETE']:
-            self.permission_classes = [IsAdminUser] # 只有管理員用戶可以更新或刪除產品
-        return super().get_permissions()
+           return [IsMerchant()] # 只有商家可以更新或刪除產品
+        return [IsAuthenticatedOrReadOnly()] # 其他人只能查看產品詳情
+    
+    def get_queryset(self):
+        if self.request.method == 'GET':
+            return Product.objects.all() # 任何人都可以查看產品詳情
+        
+        if not self.request.user.is_authenticated:
+            return Product.objects.none() # 未驗證用戶無法更新或刪除產品
+        
+        try:
+            store = Store.objects.get(user=self.request.user)
+        except Store.DoesNotExist:
+            return Product.objects.none() # 商家無商店無法更新或刪除產品
+        
+        return Product.objects.filter(store=store) # 商家只能更新或刪除自己的產品
 
+    
 class orderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.prefetch_related('items__product') # 預先取得相關的OrderItem和Product以優化查詢
     serializer_class = OrderSerializer

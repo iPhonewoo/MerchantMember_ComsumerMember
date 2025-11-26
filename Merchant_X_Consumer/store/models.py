@@ -3,6 +3,7 @@ from django.db import models
 from datetime import datetime
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from member.models import User, Member, Merchant
 
 
 
@@ -26,12 +27,30 @@ from django.conf import settings
     # def __str__(self):
     #     return self.user_name  # 回傳物件的名稱
 
+class Store(models.Model):
+    store_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    store_name = models.CharField(max_length=100, null=True, blank=True)
+    store_description = models.TextField()
+    created_at = models.DateTimeField(default=datetime.now(), editable=False,)
+    last_update = models.DateTimeField(default=datetime.now())
+    
+
+    class Meta:
+        db_table = 'store'  # 指定資料表名稱
+
+    def __str__(self):
+        return self.store_name  # 回傳物件的名稱
+
+
+
 class Product(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField()
     image = models.ImageField(upload_to='products/', null=True, blank=True)
+    store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name='products')
 
     @property
     def in_stock(self):
@@ -39,6 +58,7 @@ class Product(models.Model):
     
     def __str__(self):
         return self.name
+    
 
 class Order(models.Model):
     class StatusChoices(models.TextChoices):
@@ -47,7 +67,7 @@ class Order(models.Model):
         CANCELED = 'Canceled'
 
     order_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey('member.User', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
         max_length=10,
