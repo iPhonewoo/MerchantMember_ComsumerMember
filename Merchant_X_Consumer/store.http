@@ -37,7 +37,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
 ###
 POST http://127.0.0.1:8000/store/products/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTc0NDU5LCJpYXQiOjE3NjQ1NzQxNTksImp0aSI6IjlkNWQ1YTQ1ZDhmMTQ5YmY4OGI4MjI2ZjBjMzZiYTc2IiwidXNlcl9pZCI6IjEiLCJyb2xlIjoibWVyY2hhbnQifQ.6zxKyWIgyopTIRq4oCdifJFB_4GQK9PTWfOKBrziYXI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTc4MDA4LCJpYXQiOjE3NjQ1Nzc3MDgsImp0aSI6ImJiMGFkYTlmMDExOTQ3YmNhNGQ5MWQzZmZiZTUwYWY4IiwidXNlcl9pZCI6IjIiLCJyb2xlIjoibWVyY2hhbnQifQ.J922yWkdc_nKVbnyRHTDYfqkZh8MtiLrxaxPV9CPhXg
 
 {
     "name": "Q彈潔牙骨",
@@ -61,10 +61,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
 ###
 PUT http://127.0.0.1:8000/member/members/1/ HTTP/1.1
 Content-Type: application/json 
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTc0NjQyLCJpYXQiOjE3NjQ1NzQzNDIsImp0aSI6ImNkOTVhOGM2YTgzNjQ1OGFiYjA2YzVhMDgwZjZkOGY3IiwidXNlcl9pZCI6IjIiLCJyb2xlIjoibWVtYmVyIn0.AWVMz6n1--w8b6LVjOHAVl_ZbAZqCHsDl6vjjNjjk04
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTc5MjYzLCJpYXQiOjE3NjQ1Nzg5NjMsImp0aSI6IjVjY2Q1NTFhNDc3ODQ4YmU5MDdmOTI2OGUxMWNiMDY3IiwidXNlcl9pZCI6IjEiLCJyb2xlIjoibWVtYmVyIn0.BHWUkgfVjyInM6u1Vrlc-jHlUh_iHyEId4xDoWPxUic
 
 {
-    "member_name": "逢霖",
+    "member_name": "吳逢霖",
     "member_email": "Wu@gmail.com",
     "member_birth": "1991-10-30",
     "member_avatar": "empty.png"
@@ -73,7 +73,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
 ###
 POST http://127.0.0.1:8000/store/orders/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTc1MDI3LCJpYXQiOjE3NjQ1NzQ3MjcsImp0aSI6Ijc2ZDlhYWI0OGE3MDQxZmE4ZDY0NGNiNGVmZThlYTEyIiwidXNlcl9pZCI6IjIiLCJyb2xlIjoibWVtYmVyIn0.EZHs-1e68jqr1VmHlJwDg5TDrYokNroygDYP9sP2Y3M
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTc5MTc4LCJpYXQiOjE3NjQ1Nzg4NzgsImp0aSI6IjQyYTdmNWExMjdmZTQ2ZDFiZmJhZGU4NWE1YmQ1MjFjIiwidXNlcl9pZCI6IjEiLCJyb2xlIjoibWVtYmVyIn0.PsC0w6pkOZI5SvwMz2z4yU-Epk9ywc2tWC8UQqf9tpE
 
 {
     "status": "Pending",
@@ -92,4 +92,4 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
 ###
 GET http://127.0.0.1:8000/store/orders/1/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTc1MDI3LCJpYXQiOjE3NjQ1NzQ3MjcsImp0aSI6Ijc2ZDlhYWI0OGE3MDQxZmE4ZDY0NGNiNGVmZThlYTEyIiwidXNlcl9pZCI6IjIiLCJyb2xlIjoibWVtYmVyIn0.EZHs-1e68jqr1VmHlJwDg5TDrYokNroygDYP9sP2Y3M
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTc5MjYzLCJpYXQiOjE3NjQ1Nzg5NjMsImp0aSI6IjVjY2Q1NTFhNDc3ODQ4YmU5MDdmOTI2OGUxMWNiMDY3IiwidXNlcl9pZCI6IjEiLCJyb2xlIjoibWVtYmVyIn0.BHWUkgfVjyInM6u1Vrlc-jHlUh_iHyEId4xDoWPxUic

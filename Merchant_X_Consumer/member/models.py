@@ -34,13 +34,6 @@ class Member(models.Model):
         max_length=100, 
         default='empty.png'
     )
-    orders = models.ForeignKey(
-        'store.Order',
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name='member_orders'
-    )
     last_update = models.DateTimeField(
         default=datetime.now(), 
         editable=False

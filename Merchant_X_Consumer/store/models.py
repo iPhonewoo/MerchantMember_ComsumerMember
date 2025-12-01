@@ -87,9 +87,10 @@ class Order(models.Model):
         CANCELED = 'Canceled'
 
     order_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, 
-        on_delete=models.CASCADE
+    member = models.ForeignKey(
+        'member.Member', 
+        on_delete=models.CASCADE,
+        related_name='orders'
     )
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
@@ -101,7 +102,7 @@ class Order(models.Model):
     products = models.ManyToManyField(Product, through='OrderItem', related_name='orders')
     
     def __str__(self):
-        return f"Order {self.order_id} by {self.user.username}"
+        return f"Order {self.order_id} by {self.member.member_name}"
     
 
 class OrderItem(models.Model):

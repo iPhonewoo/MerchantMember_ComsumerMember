@@ -145,7 +145,7 @@ class orderViewSet(viewsets.ModelViewSet):
     ] #  使用多種過濾後端
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user) # 在建立訂單時自動設定user欄位為當前用戶
+        serializer.save(member=self.request.user.member) # 在建立訂單時自動設定user欄位為當前用戶
 
     def get_serializer_class(self):
         # can also check if POST: if self.request.method == 'POST'
@@ -158,7 +158,7 @@ class orderViewSet(viewsets.ModelViewSet):
         if not self.request.user.is_authenticated:
             return Order.objects.none()
         elif self.request.user.role == 'member':
-            qs = qs.filter(user=self.request.user) # 會員只能看到自己的訂單
+            qs = qs.filter(member=self.request.user.member) # 會員只能看到自己的訂單
             return qs
         elif self.request.user.role == 'merchant':
             try:
@@ -179,7 +179,7 @@ class orderViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated] # 只有已驗證的用戶可以存取這些API
     )
     def user_orders(self, request):
-        orders = self.get_queryset().filter(user=request.user) # 只顯示該用戶的訂單
+        orders = self.get_queryset().filter(user=request.user.member) # 只顯示該用戶的訂單
         serializer = self.get_serializer(orders, many=True) # 序列化訂單資料
         return Response(serializer.data) # 回傳序列化後的資料 
 

@@ -83,12 +83,12 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         model = Order
         fields = [
             'order_id',
-            'user', 
+            'member', 
             'status', 
             'items', 
         ]
         extra_kwargs = {
-            'user': {'read_only': True}, # user欄位為唯讀
+            'member': {'read_only': True}, # user欄位為唯讀
         }
     
 
@@ -103,7 +103,7 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = [
             'order_id', 
-            'user', 
+            'member', 
             'created_at', 
             'status', 
             'items', 
