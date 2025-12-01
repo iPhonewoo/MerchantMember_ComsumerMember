@@ -1,141 +1,15 @@
-GET http://127.0.0.1:8000/store/products/ HTTP/1.1
-
-###
-
-GET http://127.0.0.1:8000/store/products/2/ HTTP/1.1
-
-###
-
-DELETE http://127.0.0.1:8000/store/products/2/ HTTP/1.1
-Content-Type: application/json
-
-{
-    "name": "商品",
-    "description": "This is a new product.",
-    "price": 1500.00,
-    "stock": 200
-}
-
-###
-
-PUT http://127.0.0.1:8000/store/products/2/ HTTP/1.1
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYwNjA3MTQ5LCJpYXQiOjE3NjA2MDY4NDksImp0aSI6IjNiNmQzZDNkNDNiNjQ3NGE5MjIxOTYwN2ViY2JmM2MwIiwidXNlcl9pZCI6IjEifQ.rqWKAHXzNqMyQIIc0HRGzwsNp6XnJnC3jUBQ3O3mMOI
-
-{
-    "name": "商品",
-    "description": "This is a new product.",
-    "price": 1500.00,
-    "stock": 200
-}
-
-###
-
-POST  http://127.0.0.1:8000/store/products/ HTTP/1.1
-Content-Type: application/json
-Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYwNjAxMDcxLCJpYXQiOjE3NjA2MDA3NzEsImp0aSI6IjNkMTk5MTdhMzJiODQ3ZTFhMGZhOGUwOGMyYjFmZDUyIiwidXNlcl9pZCI6IjIifQ.Tkxv5000uN-U3w6yyQS3cZtO4YEnPmq8rN6vzYAWSr0
-
-{
-    "name": "New Product",
-    "description": "This is a new product.",
-    "price": 29.99,
-    "stock": 100
-}
-
-###
-
-POST  http://127.0.0.1:8000/api/token/ HTTP/1.1
-Content-Type: application/json
-
-{
-    "username": "admin",
-    "password": "test"
-}
-
-###
-
-POST  http://127.0.0.1:8000/api/token/refresh/ HTTP/1.1
-Content-Type: application/json
-
-{
-    "refresh" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2MDY4ODg4MSwiaWF0IjoxNzYwNjAyNDgxLCJqdGkiOiI2OTRiNGYyMTFlOGY0ZjY3YWU0M2YwNDU3MzFjOWM1ZSIsInVzZXJfaWQiOiIxIn0.Z3eH2nTHODcNr9Wf3xbaZ4IsuXzJOT121aVkzKqsOjg"
-}
-
-###
-
-GET http://127.0.0.1:8000/store/user-orders/ HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYwNjAyODA5LCJpYXQiOjE3NjA2MDI1MDksImp0aSI6IjNhMTRhNGVmODEyMTQ4NzJiODRjNTJiMjYyNjcyYjFkIiwidXNlcl9pZCI6IjEifQ.CtYQ-sfVvypq3HkuvKZTi1FCR8uuMXbHQtJv1evdqj8
-
-###
-
-GET http://127.0.0.1:8000/store/orders/ HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYwNzY1MTM3LCJpYXQiOjE3NjA3NjQ4MzcsImp0aSI6IjJlN2M2YzhlMDhhOTQ5NmY5ODBiNDVmYzM5MjQwM2Y5IiwidXNlcl9pZCI6IjIifQ.SwAtgVlgciAWYw72dL3LP3Lll9AAvdqEuYgzRYxxOaw
-
-###
-
-GET http://127.0.0.1:8000/store/orders/8/ HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYwNzg1ODUxLCJpYXQiOjE3NjA3ODU1NTEsImp0aSI6IjAyYzU4ZTc3OTQyZDQxZThhMzk1Y2IwODE5ZGYzNmY4IiwidXNlcl9pZCI6IjEifQ.lWusduoxeTsNAtdPcPysiNBUGGGA-P-09DsjPhb5qjw
-
-###
-
-POST  http://127.0.0.1:8000/store/orders/ HTTP/1.1
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYwNzgyNzEzLCJpYXQiOjE3NjA3ODI0MTMsImp0aSI6IjdjMmE4YjcyNzg1ODRmYzVhMWZkNjExNWM0ZTE1YzdiIiwidXNlcl9pZCI6IjEifQ.xfeTsPupPrJ0UTbexg1YypAh55LzpXMgDGao8Hj4Hhc
-
-{
-    "status": "Confirmed",
-    "items": [
-        {
-            "product": 2,
-            "quantity": 2
-        },
-        {
-            "product": 3,
-            "quantity": 1
-        }
-    ]
-}
-
-###
-
-PUT  http://127.0.0.1:8000/store/orders/8/ HTTP/1.1
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYwNzg2MjY3LCJpYXQiOjE3NjA3ODU5NjcsImp0aSI6IjYyODFiNjBkNDQ0NDQ4OTFiYThiMGVhMDBjMzY3MDVkIiwidXNlcl9pZCI6IjEifQ.qUd-0edGBb16AxAO3ls6r4xGgExTueAcjudM99WgKkg
-
-{
-    "status": "Confirmed",
-    "items": [
-        {
-            "product": 5,
-            "quantity": 5
-        },
-        {
-            "product": 3,
-            "quantity": 1
-        }
-    ]
-}
-
-###
-
-DELETE   http://127.0.0.1:8000/store/orders/9/ HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxNjQwMDQ1LCJpYXQiOjE3NjE2Mzk3NDUsImp0aSI6IjdlNWI4NWU3ODIxYTRjNTE4ZWYwMzcwMjcwZmU4YTNlIiwidXNlcl9pZCI6IjEifQ.3Ae4Yz3BEyHvbZKzkCXVSxUr22QGKSfLFfGelA2S0lk
-
-###
-
 POST  http://127.0.0.1:8000/member/login/ HTTP/1.1
 Content-Type: application/json
 
 {
-    "username": "tie",
+    "username": "逢霖",
     "password": "123"
 }
 
 ###
-
-PUT http://127.0.0.1:8000/store/stores/1/ HTTP/1.1
+POST http://127.0.0.1:8000/store/stores/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0MTQ3ODc4LCJpYXQiOjE3NjQxNDc1NzgsImp0aSI6ImY2YWVhYzY4ODgxZjQwYmVhYWExODgwYzYyYmRjMzhlIiwidXNlcl9pZCI6IjEiLCJyb2xlIjoibWVyY2hhbnQifQ.vQtuveYdyi8nKWVJ8DJK6JTCGaMGZRw4xc0XLcKsYlM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0MjIxMzAwLCJpYXQiOjE3NjQyMjEwMDAsImp0aSI6IjQ4OTMwZmQyZGE1NjRiYmZhY2U2OGEwZjdmY2E5YzdkIiwidXNlcl9pZCI6IjciLCJyb2xlIjoibWVyY2hhbnQifQ.5LSOk2WzITni9xX3SMG67_PhwmEtHIfAJ5kB54vVDk8
 
 {
     "store_name": "帶帶黑狗的店",
@@ -144,15 +18,32 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
 }
 
 ###
-POST http://127.0.0.1:8000/store/products/ HTTP/1.1
+
+PUT http://127.0.0.1:8000/store/stores/3/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0MTQ5MTgxLCJpYXQiOjE3NjQxNDg4ODEsImp0aSI6ImI5NWNjMjIyYWZkYjQzOWE5NDYzY2Y5ZGI2OGVhNTAwIiwidXNlcl9pZCI6IjciLCJyb2xlIjoibWVyY2hhbnQifQ.XHoh0ZaYjGDeCvfhG5ZcNvbuXldqzwc0qqnSo1YqyUk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0MjIxNTUxLCJpYXQiOjE3NjQyMjEyNTEsImp0aSI6ImY0ZDQwMWQxYTMzNjQ4MTU4ZTIzMjQwYjg2OWMzOWI5IiwidXNlcl9pZCI6IjciLCJyb2xlIjoibWVyY2hhbnQifQ.ClxoPKRvftaVf6yh2G7L04DGUyFGrsbv1aWKBLVROGo
 
 {
-    "name": "新鮮潔牙骨",
-    "description": "領帶愛吃的潔牙骨",
-    "price": 9.99,
-    "stock": 35
+    "store_name": "tie的店",
+    "store_description": "這是一家黑狗tietie的店喔！"
+
+}
+
+###
+
+DELETE  http://127.0.0.1:8000/store/stores/2/ HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0MjIxMzAwLCJpYXQiOjE3NjQyMjEwMDAsImp0aSI6IjQ4OTMwZmQyZGE1NjRiYmZhY2U2OGEwZjdmY2E5YzdkIiwidXNlcl9pZCI6IjciLCJyb2xlIjoibWVyY2hhbnQifQ.5LSOk2WzITni9xX3SMG67_PhwmEtHIfAJ5kB54vVDk8
+
+###
+POST http://127.0.0.1:8000/store/products/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTc0NDU5LCJpYXQiOjE3NjQ1NzQxNTksImp0aSI6IjlkNWQ1YTQ1ZDhmMTQ5YmY4OGI4MjI2ZjBjMzZiYTc2IiwidXNlcl9pZCI6IjEiLCJyb2xlIjoibWVyY2hhbnQifQ.6zxKyWIgyopTIRq4oCdifJFB_4GQK9PTWfOKBrziYXI
+
+{
+    "name": "Q彈潔牙骨",
+    "description": "領帶超愛的潔牙骨",
+    "price": 2.99,
+    "stock": 10
 }
 
 ###
@@ -166,3 +57,39 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
     "price": 1.99,
     "stock": 5000
 }
+
+###
+PUT http://127.0.0.1:8000/member/members/1/ HTTP/1.1
+Content-Type: application/json 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTc0NjQyLCJpYXQiOjE3NjQ1NzQzNDIsImp0aSI6ImNkOTVhOGM2YTgzNjQ1OGFiYjA2YzVhMDgwZjZkOGY3IiwidXNlcl9pZCI6IjIiLCJyb2xlIjoibWVtYmVyIn0.AWVMz6n1--w8b6LVjOHAVl_ZbAZqCHsDl6vjjNjjk04
+
+{
+    "member_name": "逢霖",
+    "member_email": "Wu@gmail.com",
+    "member_birth": "1991-10-30",
+    "member_avatar": "empty.png"
+}
+
+###
+POST http://127.0.0.1:8000/store/orders/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTc1MDI3LCJpYXQiOjE3NjQ1NzQ3MjcsImp0aSI6Ijc2ZDlhYWI0OGE3MDQxZmE4ZDY0NGNiNGVmZThlYTEyIiwidXNlcl9pZCI6IjIiLCJyb2xlIjoibWVtYmVyIn0.EZHs-1e68jqr1VmHlJwDg5TDrYokNroygDYP9sP2Y3M
+
+{
+    "status": "Pending",
+    "items": [
+        {
+            "product": 1,
+            "quantity": 2
+        },
+        {
+            "product": 2,
+            "quantity": 1
+        }
+    ]
+}
+
+###
+GET http://127.0.0.1:8000/store/orders/1/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTc1MDI3LCJpYXQiOjE3NjQ1NzQ3MjcsImp0aSI6Ijc2ZDlhYWI0OGE3MDQxZmE4ZDY0NGNiNGVmZThlYTEyIiwidXNlcl9pZCI6IjIiLCJyb2xlIjoibWVtYmVyIn0.EZHs-1e68jqr1VmHlJwDg5TDrYokNroygDYP9sP2Y3M

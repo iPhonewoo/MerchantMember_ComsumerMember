@@ -4,8 +4,6 @@ from store.models import Store, Product, Order, OrderItem
 from datetime import datetime
 
 
-
-
 class ProductSerializer(serializers.ModelSerializer):
     store_name = serializers.CharField(source='store.store_name', read_only=True) # 取得關聯的Store名稱
     class Meta:
@@ -47,6 +45,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
             'item_subtotal'
         ] # 訂單項目小計
 
+
 class OrderCreateSerializer(serializers.ModelSerializer):
     class OrderItemCreateSerializer(serializers.ModelSerializer):
         class Meta:
@@ -58,7 +57,6 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     order_id = serializers.CharField(read_only=True)
     items = OrderItemCreateSerializer(many=True, required=False) # 嵌套的OrderItem序列化器，用於建立訂單時使用
 
-    
     def update(self, instance, validated_data):
         orderitem_data = validated_data.pop('items') # 從validated_data中取出子資料(validated_data是DRF中已驗證過的dict資料)
 
@@ -72,7 +70,6 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                     OrderItem.objects.create(order=order, **item) # 一筆一筆建立子資料訂單，並連結到主資料訂單
             return order # 回傳給前端主資料訂單(已經包含子資料訂單)
             
-
     def create(self, validated_data):
         orderitem_data = validated_data.pop('items') # 從validated_data中取出子資料(validated_data是DRF中已驗證過的dict資料)
         order = Order.objects.create(**validated_data) # 建立主資料訂單(子資料已經被取出，故可以create)
@@ -94,6 +91,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             'user': {'read_only': True}, # user欄位為唯讀
         }
     
+
 class OrderSerializer(serializers.ModelSerializer):
     order_id = serializers.CharField(read_only=True) # 訂單ID為唯讀 
     items = OrderItemSerializer(many=True)

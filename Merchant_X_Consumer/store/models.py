@@ -29,10 +29,20 @@ from member.models import User, Member, Merchant
 
 class Store(models.Model):
     store_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    store_name = models.CharField(max_length=100, null=True, blank=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE
+    )
+    store_name = models.CharField(
+        max_length=100, 
+        null=True, 
+        blank=True
+    )
     store_description = models.TextField()
-    created_at = models.DateTimeField(default=datetime.now(), editable=False,)
+    created_at = models.DateTimeField(
+        default=datetime.now(), 
+        editable=False,
+    )
     last_update = models.DateTimeField(default=datetime.now())
     
 
@@ -43,14 +53,24 @@ class Store(models.Model):
         return self.store_name  # 回傳物件的名稱
 
 
-
 class Product(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2
+    )
     stock = models.PositiveIntegerField()
-    image = models.ImageField(upload_to='products/', null=True, blank=True)
-    store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name='products')
+    image = models.ImageField(
+        upload_to='products/', 
+        null=True, 
+        blank=True
+    )
+    store = models.ForeignKey(
+        Store, 
+        on_delete=models.CASCADE, 
+        related_name='products' # 讓Store可以透過products屬性存取相關的Product
+    )
 
     @property
     def in_stock(self):
@@ -67,7 +87,10 @@ class Order(models.Model):
         CANCELED = 'Canceled'
 
     order_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
         max_length=10,
@@ -77,7 +100,6 @@ class Order(models.Model):
 
     products = models.ManyToManyField(Product, through='OrderItem', related_name='orders')
     
-
     def __str__(self):
         return f"Order {self.order_id} by {self.user.username}"
     
@@ -87,8 +109,11 @@ class OrderItem(models.Model):
         Order, 
         on_delete=models.CASCADE,
         related_name='items', # 讓Order可以透過items屬性存取相關的OrderItem
-        )
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    )
+    product = models.ForeignKey(
+        Product, 
+        on_delete=models.CASCADE
+    )
     quantity = models.PositiveIntegerField()
 
     @property

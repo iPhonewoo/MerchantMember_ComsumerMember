@@ -16,6 +16,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import generics
 from rest_framework.permissions import AllowAny  # 允許任何人存取這些API
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.permissions import IsAdminUser  # 確保只有管理員用戶可以存取這些API
 from rest_framework.permissions import IsAuthenticated  # 確保只有已驗證的用戶可以存取這些API
 from rest_framework_simplejwt.views import TokenObtainPairView # 用於JWT驗證
@@ -39,26 +40,19 @@ class MemberListCreateAPIView(generics.ListCreateAPIView):
     
 
 class MemberDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Member.objects.all() 
     serializer_class = MemberSerializer # 使用ProductSerializer將Product物件轉換成JSON格式
 
     def get_permissions(self):
         if self.request.method in ['PUT', 'PATCH', 'DELETE']:
               return [IsMember()] # 只有會員可以更新或刪除會員資料
-        return [IsAuthenticated()] # 其他人只能查看會員詳情
+        return [AllowAny()] # 其他人只能查看會員資料
     
     def get_queryset(self):
-        if not self.request.user.is_authenticated:
-            return Member.objects.none() # 未驗證用戶無法查看會員資料
-        return Member.objects.filter(user=self.request.user)
+        if self.request.method == 'GET':
+            return Member.objects.all() # 任何人都可以查看會員資料
+        return Member.objects.filter(user=self.request.user) # 會員只能查看自己的會員資料
     
     def perform_update(self, serializer):
-        user = serializer.save()
-        if user.role == 'member':
-            time_range = datetime.now().day - user.last_loginDate.day
-            if time_range > 0:
-                user.login_days += 1
-                if user.login_days % 2 == 0 and user.login_days != 0:
-                    user.member.member_points += 5 # 每兩天登入增加5點
-        user.last_loginDate = datetime.now()
-        user.save() # 儲存使用者的最後登入時間
+        user = serializer.save() # 儲存更新的會員資料
+        user.last_update=datetime.now() # 更新最後修改時間
+        user.save() 

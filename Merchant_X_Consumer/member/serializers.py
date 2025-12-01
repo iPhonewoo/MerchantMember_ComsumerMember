@@ -3,7 +3,8 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer # 用
 from django.db import transaction # 用於資料庫交易管理
 from rest_framework import serializers
 from member.models import User, Member, Merchant
-from store.models import Store
+from store.models import Store,Order, OrderItem
+from store.serializers import OrderSerializer
 from datetime import datetime
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -50,13 +51,15 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             # 如果是會員，更新會員的登入天數和點數
             if hasattr(self.user, 'member'):
                 member = self.user.member
-                time_range = datetime.now().day - member.last_loginDate.day
-                if time_range > 0:
+                now = datetime.now().date()
+                thelast = member.last_loginDate.date()
+                day_passed = (now - thelast).days
+                if day_passed > 0 or member.login_days == 0:
                     member.login_days += 1
                     if member.login_days % 2 == 0:
                         member.member_points += 5 # 每兩天登入增加5點
-                    member.last_loginDate = datetime.now()
-                    member.save()
+                member.last_loginDate = datetime.now()
+                member.save()
         self.user.save()
         data['username'] = self.user.username # 回傳使用者名稱
         data['role'] = self.user.role # 回傳使用者角色
@@ -64,6 +67,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     
     
 class MemberSerializer(serializers.ModelSerializer):
+    orders = OrderSerializer(many=True, read_only=True) # 取得關聯的訂單列表
     class Meta:
         model = Member
         fields = [
@@ -72,6 +76,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'member_email',
             'member_birth',
             'member_avatar',
+            'orders',
             'last_update',
             'member_points',
             'login_days',

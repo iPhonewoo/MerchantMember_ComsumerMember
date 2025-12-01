@@ -22,11 +22,33 @@ from store.filter import (InStockFilterBackend, OrderFilter,  # 自定義的過�
 from store.models import Store, Order, OrderItem, Product
 from store.serializers import (StoreSerializer, OrderSerializer, ProductInfoSerializer,
                                ProductSerializer, OrderCreateSerializer)
-from member.permissions import IsMerchant
+from member.permissions import IsMerchant, IsMember
 from rest_framework.exceptions import PermissionDenied # 用於權限拒絕例外
 from datetime import datetime
 
 # Create your views here.
+class StoreListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Store.objects.order_by('pk') # 取得所有商店並依照pk排序
+    serializer_class = StoreSerializer # 使用StoreSerializer將Store物件轉換成JSON格式
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+           return [IsMerchant()] # 只有商戶可以新增商店
+        return [AllowAny()] # 任何人都可以查看商店列表
+    
+    def perform_create(self, serializer):
+        user = self.request.user
+        if not user.is_authenticated:
+            raise PermissionDenied("請先登入") # 確保使用者已驗證
+        
+        existing_store = Store.objects.filter(user=user).first()
+        if existing_store:
+            raise PermissionDenied("每個商家只能擁有一個商店") # 確保商家只能有一個商店
+        
+        store = serializer.save(user=user) # 將商店與使用者關聯起來並儲存
+        return store
+
+
 class StoreDetailAPIView(generics.RetrieveUpdateDestroyAPIView): 
     serializer_class = StoreSerializer # 使用StoreSerializer將Store物件轉換成JSON格式
     
@@ -47,7 +69,6 @@ class StoreDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
         store.last_update = datetime.now()
         store.save() # 更新商店的最後更新時間
     
-
 
 class ProductListCreateAPIView(generics.ListCreateAPIView):
     queryset = Product.objects.order_by('pk') # 取得所有產品
@@ -70,10 +91,6 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
         if self.request.method == 'POST':
            return [IsMerchant()] # 只有商戶可以新增產品
         return [AllowAny()] # 任何人都可以查看產品列表
-        # self.permission_classes = [AllowAny] # 任何人都可以查看產品列表
-        # if self.request.method == 'POST':
-        #     self.permission_classes = [IsMerchant] # 只有商戶可以新增產品
-        # return super().get_permissions()
    
     def perform_create(self, serializer):
         user = self.request.user
@@ -119,7 +136,7 @@ class ProductDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 class orderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.prefetch_related('items__product') # 預先取得相關的OrderItem和Product以優化查詢
     serializer_class = OrderSerializer
-    permission_classes = [AllowAny] # 任何人都可以存取這些API
+    permission_classes = [IsAuthenticatedOrReadOnly] # 只有會員可以存取這些API
     filterset_class = OrderFilter # 使用OrderFilter進行篩選
     filter_backends = [
         DjangoFilterBackend, 
@@ -137,10 +154,23 @@ class orderViewSet(viewsets.ModelViewSet):
         return super().get_serializer_class() # 使用預設的序列化器
 
     def get_queryset(self):
-        qs = super().get_queryset()
-        if not self.request.user.is_staff:
-            qs = qs.filter(user=self.request.user) # 非管理員用戶只能看到自己的訂單
-        return qs
+        qs = super().get_queryset() # 獲取預設的查詢集
+        if not self.request.user.is_authenticated:
+            return Order.objects.none()
+        elif self.request.user.role == 'member':
+            qs = qs.filter(user=self.request.user) # 會員只能看到自己的訂單
+            return qs
+        elif self.request.user.role == 'merchant':
+            try:
+                store = Store.objects.get(user=self.request.user)
+            except Store.DoesNotExist:
+                return Order.objects.none() # 商家無商店無法查看訂單
+            
+            qs = qs.filter(items__product__store=store).distinct() # 商家只能看到包含自己產品的訂單
+            return qs
+        else:
+            return qs # 管理員可以看到所有訂單
+
     
     @action(
         detail=False, 
@@ -150,21 +180,9 @@ class orderViewSet(viewsets.ModelViewSet):
     )
     def user_orders(self, request):
         orders = self.get_queryset().filter(user=request.user) # 只顯示該用戶的訂單
-        serializer = self.get_serializer(orders, many=True)
+        serializer = self.get_serializer(orders, many=True) # 序列化訂單資料
+        return Response(serializer.data) # 回傳序列化後的資料 
 
-
-
-# class OrderListAPIView(generics.ListAPIView):
-#     queryset = orders = Order.objects.all() # 取得所有訂單
-#     serializer_class = OrderSerializer 
-
-# class UserOrderListAPIView(generics.ListAPIView):
-#     queryset = orders = Order.objects.all()
-#     serializer_class = OrderSerializer
-#     permission_classes = [IsAuthenticated] # 只有已驗證的用戶可以存取這些API
-#     def get_queryset(self):
-#         qs = super().get_queryset() 
-#         return qs.filter(user=self.request.user) # 只顯示該用戶的訂單
 
 class ProductInfoAPIView(APIView):
     def get(self, request):
