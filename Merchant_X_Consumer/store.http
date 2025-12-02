@@ -2,60 +2,65 @@ POST  http://127.0.0.1:8000/member/login/ HTTP/1.1
 Content-Type: application/json
 
 {
-    "username": "逢霖",
+    "username": "tie",
     "password": "123"
 }
 
 ###
+GET  http://127.0.0.1:8000/store/stores/ HTTP/1.1
+Content-Type: application/json
+
+###
 POST http://127.0.0.1:8000/store/stores/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0MjIxMzAwLCJpYXQiOjE3NjQyMjEwMDAsImp0aSI6IjQ4OTMwZmQyZGE1NjRiYmZhY2U2OGEwZjdmY2E5YzdkIiwidXNlcl9pZCI6IjciLCJyb2xlIjoibWVyY2hhbnQifQ.5LSOk2WzITni9xX3SMG67_PhwmEtHIfAJ5kB54vVDk8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0Njc3MTcwLCJpYXQiOjE3NjQ2NzY4NzAsImp0aSI6IjA4OTIzNDQ5ODA3OTQxNDViNjVkMjkwYmZiODlmYzRkIiwidXNlcl9pZCI6IjEiLCJyb2xlIjoibWVyY2hhbnQifQ.17QWu3yTdz_xwCIBSTaBbYK1fjhQ9xZq1v-WY6_Kfyo
 
 {
-    "store_name": "帶帶黑狗的店",
-    "store_description": "這是一家黑狗帶帶很愛的店喔！"
+    "name": "帶帶黑狗的店",
+    "description": "這是一家黑狗帶帶很愛的店喔！",
+    "address": "高雄市三民區大連街373號6樓"
 
 }
 
 ###
 
-PUT http://127.0.0.1:8000/store/stores/3/ HTTP/1.1
+PUT http://127.0.0.1:8000/store/stores/1/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0MjIxNTUxLCJpYXQiOjE3NjQyMjEyNTEsImp0aSI6ImY0ZDQwMWQxYTMzNjQ4MTU4ZTIzMjQwYjg2OWMzOWI5IiwidXNlcl9pZCI6IjciLCJyb2xlIjoibWVyY2hhbnQifQ.ClxoPKRvftaVf6yh2G7L04DGUyFGrsbv1aWKBLVROGo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0Njc3MTcwLCJpYXQiOjE3NjQ2NzY4NzAsImp0aSI6IjA4OTIzNDQ5ODA3OTQxNDViNjVkMjkwYmZiODlmYzRkIiwidXNlcl9pZCI6IjEiLCJyb2xlIjoibWVyY2hhbnQifQ.17QWu3yTdz_xwCIBSTaBbYK1fjhQ9xZq1v-WY6_Kfyo
 
 {
-    "store_name": "tie的店",
-    "store_description": "這是一家黑狗tietie的店喔！"
+    "name": "帶帶黑狗的店",
+    "description": "這是一家黑狗帶帶很愛的店喔！",
+    "address": "高雄市三民區大連街373號6樓"
 
 }
 
 ###
-
-DELETE  http://127.0.0.1:8000/store/stores/2/ HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0MjIxMzAwLCJpYXQiOjE3NjQyMjEwMDAsImp0aSI6IjQ4OTMwZmQyZGE1NjRiYmZhY2U2OGEwZjdmY2E5YzdkIiwidXNlcl9pZCI6IjciLCJyb2xlIjoibWVyY2hhbnQifQ.5LSOk2WzITni9xX3SMG67_PhwmEtHIfAJ5kB54vVDk8
+GET   http://127.0.0.1:8000/store/stores/1/ HTTP/1.1
+Content-Type: application/json
 
 ###
 POST http://127.0.0.1:8000/store/products/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTc4MDA4LCJpYXQiOjE3NjQ1Nzc3MDgsImp0aSI6ImJiMGFkYTlmMDExOTQ3YmNhNGQ5MWQzZmZiZTUwYWY4IiwidXNlcl9pZCI6IjIiLCJyb2xlIjoibWVyY2hhbnQifQ.J922yWkdc_nKVbnyRHTDYfqkZh8MtiLrxaxPV9CPhXg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0Njc3MzI0LCJpYXQiOjE3NjQ2NzcwMjQsImp0aSI6IjQyODg1MjhjMTk1NDQ4ODU5MDU1ZDc3N2M3MDRlZmNiIiwidXNlcl9pZCI6IjEiLCJyb2xlIjoibWVyY2hhbnQifQ._RNGLQinHiK3pZLjvfE-N_W8xXcxZCmdY2bfWH_LkR0
 
 {
-    "name": "Q彈潔牙骨",
-    "description": "領帶超愛的潔牙骨",
-    "price": 2.99,
-    "stock": 10
+    "name": "雞肉鴨肉狗糧",
+    "description": "領帶超愛的羈押狗糧",
+    "price": 5.99,
+    "stock": 20
 }
 
 ###
-PUT http://127.0.0.1:8000/store/products/3/ HTTP/1.1
+PUT http://127.0.0.1:8000/store/products/2/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0MTQ3MDM3LCJpYXQiOjE3NjQxNDY3MzcsImp0aSI6IjkxYzkzYTcwNzkxODQ4ZGE5Y2RlMDRjOWRhZjM1NDc2IiwidXNlcl9pZCI6IjciLCJyb2xlIjoibWVyY2hhbnQifQ.AyBEkhKQtCZ5omU3JXbXxCJHqM1OD0J_7G2RApGbIPk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0Njc3NTAzLCJpYXQiOjE3NjQ2NzcyMDMsImp0aSI6ImJmMzUxY2RlYjJlZTQ1Nzk4YTcwYWY3NDhkNGZmMjI1IiwidXNlcl9pZCI6IjEiLCJyb2xlIjoibWVyY2hhbnQifQ.oERYOp5fyAECZSysXr-gSYhUQFCX2BjyUPhMeWT9db8
 
 {
-    "name": "難吃的狗糧",
-    "description": "領帶不愛吃的狗糧",
-    "price": 1.99,
-    "stock": 5000
+    "name": "雞肉鴨肉狗糧",
+    "description": "領帶超愛的羈押狗糧",
+    "price": 6.99,
+    "stock": 20
 }
 
 ###

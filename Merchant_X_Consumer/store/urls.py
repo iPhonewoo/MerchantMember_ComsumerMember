@@ -5,11 +5,11 @@ from rest_framework.routers import DefaultRouter # 使用Django REST framework�
 
 
 urlpatterns = [
-    path("products/", store_views.ProductListCreateAPIView.as_view(), name="product_list_create"), 
-    path("products/<int:pk>/", store_views.ProductDetailAPIView.as_view(), name="product_detail"), 
+    # path("products/", store_views.ProductListCreateAPIView.as_view(), name="product_list_create"), 
+    # path("products/<int:pk>/", store_views.ProductDetailAPIView.as_view(), name="product_detail"), 
     path("products/info/", store_views.ProductInfoAPIView.as_view(), name="product_info"),
-    path("stores/", store_views.StoreListCreateAPIView.as_view(), name="store_list"),
-    path("stores/<int:pk>/", store_views.StoreDetailAPIView.as_view(), name="store_detail"),
+    # path("stores/", store_views.StoreListCreateAPIView.as_view(), name="store_list"),
+    # path("stores/<int:pk>/", store_views.StoreDetailAPIView.as_view(), name="store_detail"),
     # path("orders/", store_views.OrderListAPIView.as_view(), name="order_list"),
     # path("user-orders/", store_views.UserOrderListAPIView.as_view(), name="user-orders"),
     
@@ -17,4 +17,6 @@ urlpatterns = [
 
 router = DefaultRouter()
 router.register('orders', store_views.orderViewSet, basename='order') # 註冊Order的ViewSet到路由系統
+router.register('stores', store_views.StoreViewSet, basename='store') # 註冊Store的ViewSet到路由系統
+router.register('products', store_views.ProductViewSet, basename='product') # 註冊Product的ViewSet到路由系統
 urlpatterns += router.urls

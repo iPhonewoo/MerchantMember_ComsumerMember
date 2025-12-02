@@ -6,54 +6,28 @@ from django.conf import settings
 from member.models import User, Member, Merchant
 
 
-
 # Create your models here.
-
-# class User(AbstractUser):
-    # pass
-    # user_id = models.AutoField(primary_key=True)
-    # user_name = models.CharField(max_length=20)
-    # user_email = models.EmailField(max_length=200, unique=True)
-    # user_type = models.CharField(max_length=10)  # 'member' 或 'merchant'
-    # date_joined = models.DateTimeField(default=datetime.now())
-    # is_active = models.BooleanField(default=True)
-
-    # USERNAME_FIELD = 'user_email'
-    # REQUIRED_FIELDS = ['user_name', 'user_type']
-
-    # class Meta:
-    #     db_table = 'user'  # 指定資料表名稱
-
-    # def __str__(self):
-    #     return self.user_name  # 回傳物件的名稱
-
 class Store(models.Model):
-    store_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, 
+    merchant = models.OneToOneField(
+        Merchant, 
         on_delete=models.CASCADE
     )
-    store_name = models.CharField(
-        max_length=100, 
-        null=True, 
-        blank=True
-    )
-    store_description = models.TextField()
-    created_at = models.DateTimeField(
-        default=datetime.now(), 
-        editable=False,
-    )
-    last_update = models.DateTimeField(default=datetime.now())
-    
-
-    class Meta:
-        db_table = 'store'  # 指定資料表名稱
+    name = models.CharField(max_length=50)
+    address = models.CharField(max_length=200)
+    description = models.TextField()
+    created_at = models.DateTimeField(default=datetime.now())
+    last_update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.store_name  # 回傳物件的名稱
+        return self.name  # 回傳物件的名稱
 
 
 class Product(models.Model):
+    store = models.ForeignKey(
+        Store, 
+        on_delete=models.CASCADE, 
+        related_name='products' # 讓Store可以透過products屬性存取相關的Product
+    )
     name = models.CharField(max_length=200)
     description = models.TextField()
     price = models.DecimalField(
@@ -61,17 +35,7 @@ class Product(models.Model):
         decimal_places=2
     )
     stock = models.PositiveIntegerField()
-    image = models.ImageField(
-        upload_to='products/', 
-        null=True, 
-        blank=True
-    )
-    store = models.ForeignKey(
-        Store, 
-        on_delete=models.CASCADE, 
-        related_name='products' # 讓Store可以透過products屬性存取相關的Product
-    )
-
+    
     @property
     def in_stock(self):
         return self.stock > 0
@@ -85,10 +49,8 @@ class Order(models.Model):
         PENDING = 'Pending'
         CONFIRMED = 'Confirmed'
         CANCELED = 'Canceled'
-
-    order_id = models.AutoField(primary_key=True)
     member = models.ForeignKey(
-        'member.Member', 
+        Member, 
         on_delete=models.CASCADE,
         related_name='orders'
     )
@@ -102,7 +64,7 @@ class Order(models.Model):
     products = models.ManyToManyField(Product, through='OrderItem', related_name='orders')
     
     def __str__(self):
-        return f"Order {self.order_id} by {self.member.member_name}"
+        return f"Order {self.id} by {self.member.name}"
     
 
 class OrderItem(models.Model):
@@ -115,11 +77,11 @@ class OrderItem(models.Model):
         Product, 
         on_delete=models.CASCADE
     )
-    quantity = models.PositiveIntegerField()
+    quantity = models.PositiveIntegerField(default=1)
 
     @property
     def item_subtotal(self):
         return self.product.price * self.quantity
     
     def __str__(self):
-        return f"{self.quantity} x {self.product.name} in Order {self.order.order_id}"
+        return f"{self.quantity} x {self.product.name} in Order {self.order.id}"

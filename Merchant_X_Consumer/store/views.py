@@ -22,115 +22,67 @@ from store.filter import (InStockFilterBackend, OrderFilter,  # 自定義的過�
 from store.models import Store, Order, OrderItem, Product
 from store.serializers import (StoreSerializer, OrderSerializer, ProductInfoSerializer,
                                ProductSerializer, OrderCreateSerializer)
-from member.permissions import IsMerchant, IsMember
+from member.permissions import (IsMerchant, 
+                                IsMember, 
+                                IsOwnerOfStore, 
+                                IsOwnerOfOrder, 
+                                IsOwnerOfMemberProfile, 
+                                IsOwnerOfProduct)
 from rest_framework.exceptions import PermissionDenied # 用於權限拒絕例外
 from datetime import datetime
 
 # Create your views here.
-class StoreListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Store.objects.order_by('pk') # 取得所有商店並依照pk排序
-    serializer_class = StoreSerializer # 使用StoreSerializer將Store物件轉換成JSON格式
-
+class StoreViewSet(viewsets.ModelViewSet):
+    queryset = Store.objects.all()
+    serializer_class = StoreSerializer
+    
     def get_permissions(self):
-        if self.request.method == 'POST':
-           return [IsMerchant()] # 只有商戶可以新增商店
-        return [AllowAny()] # 任何人都可以查看商店列表
+        if self.action == 'create':
+           return [IsAuthenticated(), IsMerchant()] # 只有登入後的商家可以創建商店
+        elif self.action in ['update', 'partial_update', 'destroy']:
+           return [IsAuthenticated(), IsOwnerOfStore()] # 只有商店擁有者可以修改或刪除商店
+        return [AllowAny()] # 任何人都可以查看商店列表和詳情
     
     def perform_create(self, serializer):
         user = self.request.user
-        if not user.is_authenticated:
-            raise PermissionDenied("請先登入") # 確保使用者已驗證
+        merchant = user.merchant
         
-        existing_store = Store.objects.filter(user=user).first()
+        existing_store = Store.objects.filter(merchant=merchant).first()
         if existing_store:
             raise PermissionDenied("每個商家只能擁有一個商店") # 確保商家只能有一個商店
         
-        store = serializer.save(user=user) # 將商店與使用者關聯起來並儲存
+        store = serializer.save(merchant=merchant) # 將商店與商家關聯起來並儲存
         return store
-
-
-class StoreDetailAPIView(generics.RetrieveUpdateDestroyAPIView): 
-    serializer_class = StoreSerializer # 使用StoreSerializer將Store物件轉換成JSON格式
-    
-    def get_permissions(self):
-        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
-           return [IsMerchant()] # 只有自己的商店可以修改
-        return [IsAuthenticatedOrReadOnly()] # 其他人只能查看商店詳情
-
-    def get_queryset(self):
-        if self.request.method == 'GET':
-            return Store.objects.all() # 任何人都可以查看商店詳情
-        if not self.request.user.is_authenticated:
-            return Store.objects.none() # 未驗證用戶無法查看商店資料
-        return Store.objects.filter(user=self.request.user) # 取得該商戶的商店資料
     
     def perform_update(self, serializer):
-        store = serializer.save() # 儲存更新的商店資料
-        store.last_update = datetime.now()
-        store.save() # 更新商店的最後更新時間
-    
+        serializer.save() # 儲存更新的商店資料
 
-class ProductListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Product.objects.order_by('pk') # 取得所有產品
-    serializer_class = ProductSerializer # 使用ProductSerializer將Product物件轉換成JSON格式
-    filterset_class = ProductFilter # 使用ProductFilter進行篩選
-    filter_backends = [
-        DjangoFilterBackend, 
-        filters.SearchFilter,
-        filters.OrderingFilter,
-        InStockFilterBackend
-    ] #  使用多種過濾後端
-    search_fields = ['name', 'description'] # 允許根據名稱和描述進行搜尋
-    ordering_fields = ['name', 'price', 'stock'] # 允許根據價格和庫存進行排序
-    pagination_class = PageNumberPagination # 使用分頁功能
-    pagination_class.page_size = 2 # 每頁顯示兩個產品
-    pagination_class.page_size_query_param = 'size' # 允許客戶端指定每頁顯示的產品數量
-    pagination_class.max_page_size = 4 # 每頁最多顯示十個產品
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
     def get_permissions(self):
-        if self.request.method == 'POST':
-           return [IsMerchant()] # 只有商戶可以新增產品
-        return [AllowAny()] # 任何人都可以查看產品列表
-   
+        if self.action == 'create':
+           return [IsAuthenticated(), IsMerchant()] # 只有登入後的商家可以新增、更新或刪除產品
+        elif self.action in ['update', 'partial_update', 'destroy']:
+           return [IsAuthenticated(), IsOwnerOfProduct()]
+        return [AllowAny()] # 任何人都可以查看產品列表和詳情
+    
     def perform_create(self, serializer):
         user = self.request.user
-        if not user.is_authenticated:
-            raise PermissionDenied("請先登入") # 確保使用者已驗證
+        merchant = user.merchant
         
         try:
-            store = Store.objects.get(user=user)
+            store = Store.objects.get(merchant=merchant)
         except Store.DoesNotExist:
             raise PermissionDenied("您尚未創建商店哦！") # 確保商戶有商店
         
         product = serializer.save(store=store) # 將產品與商店關聯起來並儲存
 
-        store.last_update = datetime.now()
-        store.save() # 更新商店的最後更新時間
         return product
-        
     
-class ProductDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Product.objects.all() # 取得所有產品
-    serializer_class = ProductSerializer # 使用ProductSerializer將Product物件轉換成JSON格式
-
-    def get_permissions(self):
-        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
-           return [IsMerchant()] # 只有商家可以更新或刪除產品
-        return [IsAuthenticatedOrReadOnly()] # 其他人只能查看產品詳情
-    
-    def get_queryset(self):
-        if self.request.method == 'GET':
-            return Product.objects.all() # 任何人都可以查看產品詳情
-        
-        if not self.request.user.is_authenticated:
-            return Product.objects.none() # 未驗證用戶無法更新或刪除產品
-        
-        try:
-            store = Store.objects.get(user=self.request.user)
-        except Store.DoesNotExist:
-            return Product.objects.none() # 商家無商店無法更新或刪除產品
-        
-        return Product.objects.filter(store=store) # 商家只能更新或刪除自己的產品
+    def perform_update(self, serializer):
+        serializer.save() # 儲存更新的產品資料
 
     
 class orderViewSet(viewsets.ModelViewSet):

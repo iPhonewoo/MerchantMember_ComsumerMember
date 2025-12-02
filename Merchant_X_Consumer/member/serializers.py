@@ -30,10 +30,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.save()
 
         if role == 'merchant':
-            Merchant.objects.create(user=user, merchant_name=user.username,merchant_password=user.password, merchant_email=user.email)
-            Store.objects.create(user=user, store_name=f"{user.username}的商店", store_description=f"這是{user.username}的商店")
+            merchant = Merchant.objects.create(user=user)
+            store = Store.objects.create(merchant=merchant, name=f"{user.username}的商店", address="", description="")
         else:
-            Member.objects.create(user=user, member_name=user.username, member_password=user.password, member_email=user.email)
+            Member.objects.create(user=user)
         return user
 
 

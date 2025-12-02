@@ -23,14 +23,15 @@ class StoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Store
         fields = [
-            'store_id',
-            'user', 
-            'store_name', 
-            'store_description',  
+            'merchant', 
+            'name', 
+            'description',
+            'address', 
+            'created_at',  
             'last_update',
             'products', 
         ] 
-        read_only_fields = ["user", "created_at"] # 這些欄位為唯讀
+        read_only_fields = ["merchant", "created_at"] # 這些欄位為唯讀
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
