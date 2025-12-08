@@ -90,6 +90,7 @@ source venv/bin/activate  # Windows 使用 venv\Scripts\activate
 
 # 安裝套件
 pip install -r requirements.txt
+pip freeze > requirements.txt
 
 # 建立資料庫
 python manage.py migrate
