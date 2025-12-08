@@ -60,6 +60,12 @@ class StoreViewSet(viewsets.ModelViewSet):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    filterset_class = OrderFilter # 使用OrderFilter進行篩選
+    filter_backends = [
+        DjangoFilterBackend, 
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ] #  使用多種過濾後端
 
     def get_permissions(self):
         if self.action == 'create':
@@ -84,37 +90,52 @@ class ProductViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         serializer.save() # 儲存更新的產品資料
 
-    
-class orderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.prefetch_related('items__product') # 預先取得相關的OrderItem和Product以優化查詢
-    serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly] # 只有會員可以存取這些API
-    filterset_class = OrderFilter # 使用OrderFilter進行篩選
-    filter_backends = [
-        DjangoFilterBackend, 
-        filters.SearchFilter,
-        filters.OrderingFilter,
-    ] #  使用多種過濾後端
+
+class OrderCreateAPIView(generics.CreateAPIView):
+    queryset = Order.objects.prefetch_related('items__product')
+    serializer_class = OrderCreateSerializer
+    permission_classes = [IsAuthenticated, IsMember]
 
     def perform_create(self, serializer):
-        serializer.save(member=self.request.user.member) # 在建立訂單時自動設定user欄位為當前用戶
+        serializer.save(member=self.request.user.member)
 
     def get_serializer_class(self):
-        # can also check if POST: if self.request.method == 'POST'
-        if self.action == 'create' or self.action == 'update':
-            return OrderCreateSerializer # 使用OrderCreateSerializer來建立訂單
-        return super().get_serializer_class() # 使用預設的序列化器
+        if self.request.method == 'POST':
+            return OrderCreateSerializer
+        return OrderSerializer
+    
+
+class OrderDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Order.objects.prefetch_related('items__product')
+    serializer_class = OrderSerializer
+    
+    def get_permissions(self):
+        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
+            return [IsAuthenticated(), IsOwnerOfOrder()]
+        return [IsAuthenticated()]
+
+    def get_serializer_class(self):
+        if self.request.method in ['PUT', 'PATCH']:
+            return OrderCreateSerializer
+        return OrderSerializer
+    
+    def perform_update(self, serializer):
+        serializer.save(member=self.request.user.member)
+
+    def perform_destroy(self, instance):
+        instance.delete()
 
     def get_queryset(self):
+        user = self.request.user
         qs = super().get_queryset() # 獲取預設的查詢集
-        if not self.request.user.is_authenticated:
+        if not user.is_authenticated:
             return Order.objects.none()
-        elif self.request.user.role == 'member':
-            qs = qs.filter(member=self.request.user.member) # 會員只能看到自己的訂單
+        elif user.role == 'member':
+            qs = qs.filter(member=user.member) # 會員只能看到自己的訂單
             return qs
-        elif self.request.user.role == 'merchant':
+        elif user.role == 'merchant':
             try:
-                store = Store.objects.get(user=self.request.user)
+                store = Store.objects.get(user=user)
             except Store.DoesNotExist:
                 return Order.objects.none() # 商家無商店無法查看訂單
             
@@ -122,18 +143,6 @@ class orderViewSet(viewsets.ModelViewSet):
             return qs
         else:
             return qs # 管理員可以看到所有訂單
-
-    
-    @action(
-        detail=False, 
-        methods=['get'], 
-        url_path='user-orders', # 自訂URL路徑
-        permission_classes=[IsAuthenticated] # 只有已驗證的用戶可以存取這些API
-    )
-    def user_orders(self, request):
-        orders = self.get_queryset().filter(user=request.user.member) # 只顯示該用戶的訂單
-        serializer = self.get_serializer(orders, many=True) # 序列化訂單資料
-        return Response(serializer.data) # 回傳序列化後的資料 
 
 
 class ProductInfoAPIView(APIView):

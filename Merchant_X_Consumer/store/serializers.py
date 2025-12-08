@@ -1,5 +1,6 @@
 from django.db import transaction # 用於資料庫交易管理
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from store.models import Store, Product, Order, OrderItem
 from datetime import datetime
 
@@ -59,24 +60,45 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     items = OrderItemCreateSerializer(many=True, required=False) # 嵌套的OrderItem序列化器，用於建立訂單時使用
 
     def update(self, instance, validated_data):
-        orderitem_data = validated_data.pop('items') # 從validated_data中取出子資料(validated_data是DRF中已驗證過的dict資料)
+        new_status = validated_data.get('status', instance.status)
+        if not instance.can_transition(new_status):
+            raise ValidationError(
+                f"訂單無法從 {instance.status} 改為 {new_status} !"
+            ) # 驗證訂單狀態的轉換正常
+        
+        orderitem_data = validated_data.pop('items', None) # 從validated_data中取出子資料(validated_data是DRF中已驗證過的dict資料)
 
         with transaction.atomic(): # 使用資料庫交易確保資料一致性
             order = super().update(instance, validated_data) # 更新主資料訂單(子資料已經被取出，故可以update)
 
-            if orderitem_data is not None:
-                order.items.all().delete() # 刪除舊的OrderItem
+            if 'items' in self.initial_data: # 如果前端有傳入items資料
+                order.items.all().delete()
+                orderitem_data = orderitem_data or [] 
 
                 for item in orderitem_data:
                     OrderItem.objects.create(order=order, **item) # 一筆一筆建立子資料訂單，並連結到主資料訂單
             return order # 回傳給前端主資料訂單(已經包含子資料訂單)
             
     def create(self, validated_data):
-        orderitem_data = validated_data.pop('items') # 從validated_data中取出子資料(validated_data是DRF中已驗證過的dict資料)
-        order = Order.objects.create(**validated_data) # 建立主資料訂單(子資料已經被取出，故可以create)
+        orderitem_data = validated_data.pop('items',[]) # 從validated_data中取出子資料(validated_data是DRF中已驗證過的dict資料)
 
-        for item in orderitem_data:
-            OrderItem.objects.create(order=order, **item) # 一筆一筆建立子資料訂單，並連結到主資料訂單
+        with transaction.atomic():
+            order = Order.objects.create(**validated_data) # 建立主資料訂單(子資料已經被取出，故可以create)
+
+            for item in orderitem_data:
+                product = Product.objects.select_for_update().get(
+                    id=item['product'].id
+                ) # 鎖定產品資料以避免競爭條件
+                
+                if product.stock < item['quantity']:
+                    raise ValidationError(
+                        f"{product.name} 庫存不足(剩餘 {product.stock} )"
+                    )
+                
+                product.stock -= item['quantity']
+                product.save()
+
+                OrderItem.objects.create(order=order, **item) # 一筆一筆建立子資料訂單，並連結到主資料訂單
 
         return order # 回傳給前端主資料訂單(已經包含子資料訂單)
     

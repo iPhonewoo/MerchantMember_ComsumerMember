@@ -46,9 +46,12 @@ class Product(models.Model):
 
 class Order(models.Model):
     class StatusChoices(models.TextChoices):
-        PENDING = 'Pending'
-        CONFIRMED = 'Confirmed'
-        CANCELED = 'Canceled'
+        PENDING = 'pending', 'Pending'
+        PAID = 'paid', 'Paid'
+        SHIPPED = 'shipped', 'Shipped'
+        COMPLETED = 'completed', 'Completed'
+        CANCELED = 'canceled', 'Canceled'
+            
     member = models.ForeignKey(
         Member, 
         on_delete=models.CASCADE,
@@ -56,15 +59,25 @@ class Order(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
-        max_length=10,
+        max_length=20,
         choices=StatusChoices.choices,
         default=StatusChoices.PENDING,
     )
 
     products = models.ManyToManyField(Product, through='OrderItem', related_name='orders')
     
+    def can_transition(self, new_status):
+        transitions = {
+            self.StatusChoices.PENDING: [self.StatusChoices.PAID, self.StatusChoices.CANCELED],
+            self.StatusChoices.PAID: [self.StatusChoices.SHIPPED],
+            self.StatusChoices.SHIPPED: [self.StatusChoices.COMPLETED],
+            self.StatusChoices.COMPLETED: [],
+            self.StatusChoices.CANCELED: [],
+        }
+        return new_status in transitions[self.status, []] # 避免有非預期狀態而導致API崩潰
+
     def __str__(self):
-        return f"Order {self.id} by {self.member.name}"
+        return f"Order {self.id} by {self.member.user.username}"
     
 
 class OrderItem(models.Model):

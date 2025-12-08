@@ -71,10 +71,8 @@ class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
         fields = [
-            'member_id',
-            'member_name',
-            'member_email',
-            'member_birth',
+            'name',
+            'birthday',
             'member_avatar',
             'orders',
             'last_update',
