@@ -60,7 +60,7 @@ class StoreViewSet(viewsets.ModelViewSet):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    filterset_class = OrderFilter # 使用OrderFilter進行篩選
+    filterset_class = ProductFilter 
     filter_backends = [
         DjangoFilterBackend, 
         filters.SearchFilter,
