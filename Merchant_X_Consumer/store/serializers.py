@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from store.models import Store, Product, Order, OrderItem
 from datetime import datetime
+from decimal import Decimal
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -56,34 +57,53 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                 'product', 
                 'quantity', 
             ]
-    order_id = serializers.CharField(read_only=True)
-    items = OrderItemCreateSerializer(many=True, required=False) # 嵌套的OrderItem序列化器，用於建立訂單時使用
+    class Meta:
+        model = Order
+        fields = [
+            'order_number',
+            'member',
+            'receiver_name',
+            'receiver_phone',
+            'address',
+            'note', 
+            'status', 
+            'items', 
+        ]
+        read_only_fields = [
+            'order_number',
+            'member',
+        ]
+    order_number = serializers.CharField(read_only=True)
+    items = OrderItemCreateSerializer(many=True, required=True) # 嵌套的OrderItem序列化器，用於建立訂單時使用
 
     def update(self, instance, validated_data):
-        new_status = validated_data.get('status', instance.status)
-        if not instance.can_transition(new_status):
-            raise ValidationError(
-                f"訂單無法從 {instance.status} 改為 {new_status} !"
-            ) # 驗證訂單狀態的轉換正常
+        new_status = validated_data.get('status') 
+        if new_status:
+            if not instance.can_transition(new_status):
+                raise ValidationError(
+                    f"訂單無法從 {instance.status} 改為 {new_status} !"
+                ) # 驗證訂單狀態的轉換正常
+            instance.status = new_status
         
-        orderitem_data = validated_data.pop('items', None) # 從validated_data中取出子資料(validated_data是DRF中已驗證過的dict資料)
+        instance.receiver_name = validated_data.get('receiver_name', instance.receiver_name)
+        instance.receiver_phone = validated_data.get('receiver_phone', instance.receiver_phone)
+        instance.address = validated_data.get('address', instance.address)
+        instance.note = validated_data.get('note', instance.note)
 
-        with transaction.atomic(): # 使用資料庫交易確保資料一致性
-            order = super().update(instance, validated_data) # 更新主資料訂單(子資料已經被取出，故可以update)
-
-            if 'items' in self.initial_data: # 如果前端有傳入items資料
-                order.items.all().delete()
-                orderitem_data = orderitem_data or [] 
-
-                for item in orderitem_data:
-                    OrderItem.objects.create(order=order, **item) # 一筆一筆建立子資料訂單，並連結到主資料訂單
-            return order # 回傳給前端主資料訂單(已經包含子資料訂單)
-            
+        instance.save()
+        return instance
+         
     def create(self, validated_data):
         orderitem_data = validated_data.pop('items',[]) # 從validated_data中取出子資料(validated_data是DRF中已驗證過的dict資料)
+        member = validated_data.pop('member')
+
+        if not orderitem_data:
+            raise ValidationError("訂單至少要有一項商品喔！")
 
         with transaction.atomic():
-            order = Order.objects.create(**validated_data) # 建立主資料訂單(子資料已經被取出，故可以create)
+            order = Order.objects.create(member=member, **validated_data) # 建立主資料訂單(子資料已經被取出，故可以create)
+
+            total_amount = Decimal(0)
 
             for item in orderitem_data:
                 product = Product.objects.select_for_update().get(
@@ -95,28 +115,28 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                         f"{product.name} 庫存不足(剩餘 {product.stock} )"
                     )
                 
+                price = product.price
+                subtotal = price * item['quantity']
+                total_amount += subtotal
+                
                 product.stock -= item['quantity']
                 product.save()
 
-                OrderItem.objects.create(order=order, **item) # 一筆一筆建立子資料訂單，並連結到主資料訂單
+                OrderItem.objects.create(
+                    order=order,
+                    product=product,
+                    quantity=item['quantity'],
+                    price_at_purchase=price,
+                ) # 一筆一筆建立子資料訂單，並連結到主資料訂單
+
+            order.total_amount = total_amount
+            order.save()
 
         return order # 回傳給前端主資料訂單(已經包含子資料訂單)
-    
-    class Meta:
-        model = Order
-        fields = [
-            'order_id',
-            'member', 
-            'status', 
-            'items', 
-        ]
-        extra_kwargs = {
-            'member': {'read_only': True}, # user欄位為唯讀
-        }
-    
+      
 
 class OrderSerializer(serializers.ModelSerializer):
-    order_id = serializers.CharField(read_only=True) # 訂單ID為唯讀 
+    order_number = serializers.CharField(read_only=True) # 訂單編號 
     items = OrderItemSerializer(many=True)
     total_price =serializers.SerializerMethodField(method_name='get_total_price') # 計算訂單總價
     def get_total_price(self, obj):
@@ -125,8 +145,12 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [
-            'order_id', 
+            'order_number',
             'member', 
+            'receiver_name',
+            'receiver_phone',
+            'address',
+            'note',
             'created_at', 
             'status', 
             'items', 

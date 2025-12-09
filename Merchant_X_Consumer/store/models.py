@@ -1,4 +1,5 @@
-import uuid
+import random
+from decimal import Decimal
 from django.db import models
 from datetime import datetime
 from django.contrib.auth.models import AbstractUser
@@ -7,6 +8,11 @@ from member.models import User, Member, Merchant
 
 
 # Create your models here.
+def generate_order_number():
+    today = datetime.date.today().strftime('%Y%m%d')
+    random_digits = str(random.randint(100000, 999999))
+    return f"ORD{today}-{random_digits}"
+
 class Store(models.Model):
     merchant = models.OneToOneField(
         Merchant, 
@@ -45,18 +51,22 @@ class Product(models.Model):
     
 
 class Order(models.Model):
+    order_number = models.CharField(max_length=30, unique=True, editable=False)
     class StatusChoices(models.TextChoices):
         PENDING = 'pending', 'Pending'
         PAID = 'paid', 'Paid'
         SHIPPED = 'shipped', 'Shipped'
         COMPLETED = 'completed', 'Completed'
-        CANCELED = 'canceled', 'Canceled'
-            
+        CANCELED = 'canceled', 'Canceled'        
     member = models.ForeignKey(
         Member, 
         on_delete=models.CASCADE,
         related_name='orders'
     )
+    receiver_name = models.CharField(max_length=50)
+    receiver_phone = models.CharField(max_length=20)
+    address = models.CharField(max_length=255)
+    note = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
         max_length=20,
@@ -65,19 +75,42 @@ class Order(models.Model):
     )
 
     products = models.ManyToManyField(Product, through='OrderItem', related_name='orders')
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    class PaymentMethodChoices(models.TextChoices):
+        UNPAID = 'unpaid', 'Unpaid'
+        CREDIT_CARD = 'credit_card', 'Credit Card'
+        LINE_PAY = 'line_pay', 'LINE Pay'
+        CASH = 'cash', 'Cash'
+    payment_method = models.CharField(
+        max_length=20,
+        choices=PaymentMethodChoices.choices,
+        default=PaymentMethodChoices.UNPAID
+    )
+    transaction_id = models.CharField(max_length=64, null=True, blank=True) # 金流交易編號（只有已付款訂單才會有）
+    paid_at = models.DateTimeField(null=True, blank=True)
     
+    def save(self, *args, **kwargs):
+        if not self.order_number:
+            new_order_number = generate_order_number()
+            while Order.objects.filter(order_number=new_order_number).exists():
+                new_order_number = generate_order_number()
+            self.order_number = new_order_number
+
+        super().save(*args, **kwargs)
+     
     def can_transition(self, new_status):
         transitions = {
-            self.StatusChoices.PENDING: [self.StatusChoices.PAID, self.StatusChoices.CANCELED],
-            self.StatusChoices.PAID: [self.StatusChoices.SHIPPED],
-            self.StatusChoices.SHIPPED: [self.StatusChoices.COMPLETED],
-            self.StatusChoices.COMPLETED: [],
-            self.StatusChoices.CANCELED: [],
+            'pending': ['paid', 'canceled'],
+            'paid': ['shipped'],
+            'shipped': ['completed'],
+            'completed': [],
+            'canceled': [],
         }
-        return new_status in transitions[self.status, []] # 避免有非預期狀態而導致API崩潰
+        return new_status in transitions.get(self.status, []) # 避免非預期狀態而崩潰，故給空集合
 
     def __str__(self):
-        return f"Order {self.id} by {self.member.user.username}"
+        return f"Order {self.order_number} by {self.member.user.username}"
     
 
 class OrderItem(models.Model):
@@ -91,10 +124,11 @@ class OrderItem(models.Model):
         on_delete=models.CASCADE
     )
     quantity = models.PositiveIntegerField(default=1)
+    price_at_purchase = models.DecimalField(max_digits=10, decimal_places=2)
 
     @property
     def item_subtotal(self):
-        return self.product.price * self.quantity
+        return self.product * Decimal(self.quantity)
     
     def __str__(self):
-        return f"{self.quantity} x {self.product.name} in Order {self.order.id}"
+        return f"{self.quantity} x {self.product.name} @ {self.price_at_purchase} in Order {self.order.id}"

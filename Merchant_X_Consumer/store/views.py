@@ -120,29 +120,25 @@ class OrderDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
         return OrderSerializer
     
     def perform_update(self, serializer):
-        serializer.save(member=self.request.user.member)
-
-    def perform_destroy(self, instance):
-        instance.delete()
+        serializer.save()
 
     def get_queryset(self):
         user = self.request.user
-        qs = super().get_queryset() # 獲取預設的查詢集
+
         if not user.is_authenticated:
             return Order.objects.none()
-        elif user.role == 'member':
-            qs = qs.filter(member=user.member) # 會員只能看到自己的訂單
-            return qs
-        elif user.role == 'merchant':
+        
+        if user.role == 'member':
+            return Order.objects.filter(member=user.member) # 會員只會看到自己的訂單
+        
+        if user.role == 'merchant':
             try:
-                store = Store.objects.get(user=user)
+                store = user.merchant.store
+                return Order.objects.filter(items__product__store=store).distinct() #商家只能看到有自己商品的訂單
             except Store.DoesNotExist:
                 return Order.objects.none() # 商家無商店無法查看訂單
             
-            qs = qs.filter(items__product__store=store).distinct() # 商家只能看到包含自己產品的訂單
-            return qs
-        else:
-            return qs # 管理員可以看到所有訂單
+        return Order.objects.all() # 管理員可以看到所有訂單
 
 
 class ProductInfoAPIView(APIView):

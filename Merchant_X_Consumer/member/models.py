@@ -24,6 +24,8 @@ class Member(models.Model):
     )
     name = models.CharField(max_length=20)
     birthday = models.DateField(null=True, blank=True)
+    address = models.CharField(max_length=200)
+    phone_num = models.CharField(max_length=20)
     member_avatar = models.CharField(
         max_length=100, 
         default='empty.png'
