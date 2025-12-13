@@ -136,9 +136,8 @@ python manage.py runserver
 🛒 Order API（開發中）
 
 🚀 API Request / Response 範例
-## 🔑 Auth 認證 API
-### 1️⃣ 註冊 Register
-Endpoint
+##  Auth 認證 API
+### 1 註冊 Register
 POST /member/register/
 
 Request Body
@@ -157,8 +156,7 @@ Success Response
   "role": "member"
 }
 
-### 2️⃣ 登入 Login
-Endpoint
+### 2 登入 Login
 POST /member/login/
 
 Request Body
@@ -175,9 +173,9 @@ Success Response
   "role": "member"
 }
 
-## 👤 Member 會員 API
-Endpoint
-GET /api/members/{id}/
+## Member 會員 API
+### 3 會員資料查詢
+GET /member/members/{id}/
 ⭕ 只能查看自己的資料（IsOwnerOfMemberProfile）
 
 Example
@@ -187,9 +185,17 @@ Success Response
 {
   "name": "John",
   "birthday": "2025-01-01",
+  "member_avatar": "empty.png",
+  "address": "高雄市高雄區高雄路100號",
+  "phone_num": "0912345678",
   "orders": [
     {
+      "order_number": "ORD20251213-779524",
       "member": 1,
+      "receiver_name": "John",
+      "receiver_phone": "0912345678",
+      "address": "高雄市高雄區高雄路100號",
+      "note": "",
       "created_at": "2025-12-07T22:52:16.966555+08:00",
       "status": "pending",
       "items": [
@@ -215,7 +221,7 @@ Success Response
   "last_loginDate": "2025-12-08T18:03:34.595867+08:00"
 }
 
-### 4️⃣ 更新自己的會員資料
+### 4 更新自己的會員資料
 PATCH /member/members/{id}/
 Request Body
 {
@@ -224,11 +230,19 @@ Request Body
 
 Success Response
 {
-  "name": "John",
+  "name": "John Wu",
   "birthday": "2025-01-01",
+  "member_avatar": "empty.png",
+  "address": "高雄市高雄區高雄路100號",
+  "phone_num": "0912345678",
   "orders": [
     {
+      "order_number": "ORD20251213-779524",
       "member": 1,
+      "receiver_name": "John",
+      "receiver_phone": "0912345678",
+      "address": "高雄市高雄區高雄路100號",
+      "note": "",
       "created_at": "2025-12-07T22:52:16.966555+08:00",
       "status": "pending",
       "items": [
@@ -254,17 +268,17 @@ Success Response
   "last_loginDate": "2025-12-08T18:03:34.595867+08:00"
 }
 
-## 🏬 Store 商店 API
-### 5️⃣ 商家建立商店
-Endpoint
+## Store 商店 API
+### 5 商家建立商店
 POST /store/stores/
 ⭕ 必須是登入後的商家（IsMerchant）
 ⭕ 每個商家只能建立一間商店（系統自動限制）
 
 Request Body
 {
-  "name": "Apple Shop",
-  "description": "Premium electronics and accessories."
+  "name": "帶帶黑狗的店",
+  "description": "這是一家黑狗帶帶很愛的店喔！",
+  "address": "高雄市高雄區高雄街100號10樓"
 }
 
 Success Response
@@ -275,27 +289,14 @@ Success Response
   "address": "高雄市高雄區高雄街100號10樓",
   "created_at": "2025-12-02T19:57:27.396909+08:00",
   "last_update": "2025-12-02T20:05:23.037647+08:00",
-  "products": [
-    {
-      "description": "領帶超愛的潔牙骨",
-      "name": "Q彈潔牙骨",
-      "price": "2.99",
-      "stock": 8
-    },
-    {
-      "description": "領帶超愛的羈押狗糧",
-      "name": "雞肉鴨肉狗糧",
-      "price": "6.99",
-      "stock": 19
-    }
-  ]
+  "products": []
 }
 
-### 6️⃣ 查看商店列表（公開）
+### 6 查看商店列表（公開）
 GET /store/stores/
-Response
+Success Response
 {
-  "count": 1,
+  "count": 2,
   "next": null,
   "previous": null,
   "results": [
@@ -303,124 +304,299 @@ Response
       "merchant": 1,
       "name": "帶帶黑狗的店",
       "description": "這是一家黑狗帶帶很愛的店喔！",
-      "address": "高雄市三民區大連街373號6樓",
-      "created_at": "2025-12-02T19:57:27.396909+08:00",
-      "last_update": "2025-12-02T20:05:23.037647+08:00",
+      "address": "高雄市高雄區高雄街10號10樓",
+      "created_at": "2025-12-13T15:13:04.136497+08:00",
+      "last_update": "2025-12-13T15:15:19.303452+08:00",
       "products": [
         {
-          "description": "領帶超愛的潔牙骨",
-          "name": "Q彈潔牙骨",
-          "price": "2.99",
-          "stock": 8
+          "description": "領帶沒有很愛",
+          "name": "牛肉骰子",
+          "price": "10.99",
+          "stock": 12
         },
         {
-          "description": "領帶超愛的羈押狗糧",
-          "name": "雞肉鴨肉狗糧",
+          "description": "含有豐富雞肉與鴨肉的狗糧",
+          "name": "羈押狗糧",
+          "price": "7.99",
+          "stock": 0
+        },
+        {
+          "description": "讓帶帶牙齒乾淨溜溜的潔牙骨",
+          "name": "Q彈潔牙骨",
+          "price": "5.99",
+          "stock": 20
+        },
+        {
+          "description": "讓皮膚發亮的狗糧",
+          "name": "鮭魚凍乾糧",
+          "price": "7.99",
+          "stock": 13
+        }
+      ]
+    },
+    {
+      "merchant": 2,
+      "name": "有條白色領帶的黑狗的店",
+      "description": "這是一家黑狗有白色領帶很愛的店喔！",
+      "address": "高雄市高雄區高雄街20號10樓",
+      "created_at": "2025-12-13T15:13:04.136497+08:00",
+      "last_update": "2025-12-13T15:17:47.797501+08:00",
+      "products": [
+        {
+          "description": "濃郁奶香Q彈潔牙骨",
+          "name": "牛奶潔牙骨",
           "price": "6.99",
-          "stock": 19
+          "stock": 23
+        },
+        {
+          "description": "濃郁起司，狗狗peace",
+          "name": "起司凍乾",
+          "price": "5.99",
+          "stock": 35
         }
       ]
     }
   ]
 }
 
-### 7️⃣ 更新自己的商店
+### 7 更新自己的商店
 PATCH /store/stores/{id}/
 ⭕ 只能修改自己的商店（IsOwnerOfStore）
 
 Request Body
 {
-  "description": "Best electronics with warranty."
+  "address": "高雄市高雄區高雄街100號10樓"
 }
 
-Response
+Success Response
 {
   "merchant": 1,
   "name": "帶帶黑狗的店",
-  "description": "Best electronics with warranty."",
+  "description": "這是一家黑狗帶帶很愛的店喔！",
   "address": "高雄市高雄區高雄街100號10樓",
-  "created_at": "2025-12-02T19:57:27.396909+08:00",
-  "last_update": "2025-12-02T20:05:23.037647+08:00",
+  "created_at": "2025-12-13T15:13:04.136497+08:00",
+  "last_update": "2025-12-13T16:41:19.168678+08:00",
   "products": [
     {
-      "description": "領帶超愛的潔牙骨",
-      "name": "Q彈潔牙骨",
-      "price": "2.99",
-      "stock": 8
+      "description": "領帶沒有很愛",
+      "name": "牛肉骰子",
+      "price": "10.99",
+      "stock": 12
     },
     {
-      "description": "領帶超愛的羈押狗糧",
-      "name": "雞肉鴨肉狗糧",
-      "price": "6.99",
-      "stock": 19
+      "description": "含有豐富雞肉與鴨肉的狗糧",
+      "name": "羈押狗糧",
+      "price": "7.99",
+      "stock": 0
+    },
+    {
+      "description": "讓帶帶牙齒乾淨溜溜的潔牙骨",
+      "name": "Q彈潔牙骨",
+      "price": "5.99",
+      "stock": 20
+    },
+    {
+      "description": "讓皮膚發亮的狗糧",
+      "name": "鮭魚凍乾糧",
+      "price": "7.99",
+      "stock": 13
     }
   ]
 }
 
-## 📦 Product 商品 API
-Endpoint
+## Product 商品 API
+### 8 商家新增商品
 POST /store/products/
 ⭕ 必須為商家 & 已建立商店
 
 Request Body
 {
-  "name": "雞肉鴨肉狗糧",
-  "description": "領帶超愛的羈押狗糧"
-  "price": "79.00",
-  "stock": 30
+    "name": "起司凍乾",
+    "description": "濃郁起司，狗狗peace",
+    "price": 5.99,
+    "stock": 35
 }
 
 Success Response
 {
-  "description": "領帶超愛的羈押狗糧"
-  "name": "雞肉鴨肉狗糧",
-  "price": "79.00",
-  "stock": 30
+    "name": "起司凍乾",
+    "description": "濃郁起司，狗狗peace",
+    "price": 5.99,
+    "stock": 35
 }
 
-### 9️⃣ 查看商品列表（公開）
+### 9 查看商品列表（公開）
 GET /store/products/
 Response
 {
-  "count": 3,
-  "next": null,
+  "count": 6,
+  "next": "http://127.0.0.1:8000/store/products/?page=2",
   "previous": null,
   "results": [
-    {
-      "description": "領帶超愛的潔牙骨",
-      "name": "Q彈潔牙骨",
-      "price": "2.99",
-      "stock": 8
-    },
-    {
-      "description": "領帶超愛的羈押狗糧",
-      "name": "雞肉鴨肉狗糧",
-      "price": "6.99",
-      "stock": 19
-    },
     {
       "description": "領帶沒有很愛",
       "name": "牛肉骰子",
       "price": "10.99",
-      "stock": 15
+      "stock": 12
+    },
+    {
+      "description": "含有豐富雞肉與鴨肉的狗糧",
+      "name": "羈押狗糧",
+      "price": "7.99",
+      "stock": 0
+    },
+    {
+      "description": "讓帶帶牙齒乾淨溜溜的潔牙骨",
+      "name": "Q彈潔牙骨",
+      "price": "5.99",
+      "stock": 20
+    },
+    {
+      "description": "讓皮膚發亮的狗糧",
+      "name": "鮭魚凍乾糧",
+      "price": "7.99",
+      "stock": 13
+    },
+    {
+      "description": "濃郁奶香Q彈潔牙骨",
+      "name": "牛奶潔牙骨",
+      "price": "6.99",
+      "stock": 23
     }
   ]
 }
 
-### 🔟 修改商品（限 owner）
+### 10 修改商品（限 owner）
 PATCH /store/products/{id}/
 Request Body
 {
-  "stock": 25
+  "stock": 20
 }
 
-Response
+Success Response
 {
-  "description": "領帶超愛的羈押狗糧"
-  "name": "雞肉鴨肉狗糧",
-  "price": "79.00",
-  "stock": 15
+  "description": "含有豐富雞肉與鴨肉的狗糧",
+  "name": "羈押狗糧",
+  "price": "7.99",
+  "stock": 20
 }
+
+## Order 訂單處理 API
+### 11 訂單詳細資料
+GET /store/orders/{id}/
+Success Response
+{
+  "order_number": "ORD20250225-00123",
+  "member": 17,
+  "receiver_name": "王小明",
+  "receiver_phone": "0912345678",
+  "address": "台北市信義區松智路 1 號",
+  "note": "請於晚上 6 點後送達",
+  "created_at": "2025-02-25T10:32:11Z",
+  "status": "pending",
+  "items": [
+    {
+      "product_name": "高山烏龍茶禮盒",
+      "product_price": "550.00",
+      "quantity": 2,
+      "item_subtotal": "1100.00"
+    },
+    {
+      "product_name": "100% 純蜂蜜",
+      "product_price": "300.00",
+      "quantity": 1,
+      "item_subtotal": "300.00"
+    }
+  ],
+  "total_amount": "1400.00"
+}
+
+### 12 建立訂單成功回傳
+POST /store/orders/
+Request Body
+{
+  "receiver_name": "王小明",
+  "receiver_phone": "0912345678",
+  "address": "台北市信義區松智路 1 號",
+  "note": "請用紙箱包裝",
+  "items": [
+    { "product": 5, "quantity": 2 },
+    { "product": 9, "quantity": 1 }
+  ]
+}
+
+Success Response
+{
+  "order_number": "ORD20250225-00124",
+  "member": 17,
+  "receiver_name": "王小明",
+  "receiver_phone": "0912345678",
+  "address": "台北市信義區松智路 1 號",
+  "note": "請用紙箱包裝",
+  "status": "pending",
+  "items": [
+    {
+      "product_name": "高山烏龍茶禮盒",
+      "product_price": "550.00",
+      "quantity": 2,
+      "item_subtotal": "1100.00"
+    },
+    {
+      "product_name": "100% 純蜂蜜",
+      "product_price": "300.00",
+      "quantity": 1,
+      "item_subtotal": "300.00"
+    }
+  ],
+  "total_amount": "1400.00"
+}
+
+### 13 修改訂單（會員修改地址、商家修改狀態）
+PATCH /store/orders/{id}/
+Request Body（會員更新地址）
+{
+  "address": "台北市大安區忠孝東路三段 200 號"
+}
+
+Success Response
+{
+  "order_number": "ORD20250225-00124",
+  "member": 17,
+  "receiver_name": "王小明",
+  "receiver_phone": "0912345678",
+  "address": "台北市大安區忠孝東路三段 200 號",
+  "note": "請用紙箱包裝",
+  "created_at": "2025-02-25T10:35:14Z",
+  "status": "pending",
+  "items": [
+    {
+      "product_name": "高山烏龍茶禮盒",
+      "product_price": "550.00",
+      "quantity": 2,
+      "item_subtotal": "1100.00"
+    },
+    {
+      "product_name": "100% 純蜂蜜",
+      "product_price": "300.00",
+      "quantity": 1,
+      "item_subtotal": "300.00"
+    }
+  ],
+  "total_amount": "1400.00"
+}
+
+Request Body（商家更新狀態 → paid）
+{
+  "status": "paid"
+}
+
+Success Response
+{
+  "order_number": "ORD20250225-00124",
+  "status": "paid",
+  "total_amount": "1400.00"
+}
+
 
 
 

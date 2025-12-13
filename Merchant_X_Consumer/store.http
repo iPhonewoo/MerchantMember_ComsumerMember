@@ -2,7 +2,7 @@ POST  http://127.0.0.1:8000/member/login/ HTTP/1.1
 Content-Type: application/json
 
 {
-    "username": "tie",
+    "username": "tietie",
     "password": "123"
 }
 
@@ -13,7 +13,7 @@ Content-Type: application/json
 ###
 POST http://127.0.0.1:8000/store/stores/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0Njc3MTcwLCJpYXQiOjE3NjQ2NzY4NzAsImp0aSI6IjA4OTIzNDQ5ODA3OTQxNDViNjVkMjkwYmZiODlmYzRkIiwidXNlcl9pZCI6IjEiLCJyb2xlIjoibWVyY2hhbnQifQ.17QWu3yTdz_xwCIBSTaBbYK1fjhQ9xZq1v-WY6_Kfyo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY1NjEwMzc5LCJpYXQiOjE3NjU2MTAwNzksImp0aSI6IjAyYjdkYWMyYTNiYTRmZjlhNjFkMzEzZmI2MzhhYmQzIiwidXNlcl9pZCI6IjEiLCJyb2xlIjoibWVyY2hhbnQifQ.lOou4xJZcBlprykCiMDBUQY3ZjyNbdBEEsAB4pkE968
 
 {
     "name": "帶帶黑狗的店",
@@ -24,13 +24,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
 
 ###
 
-PUT http://127.0.0.1:8000/store/stores/1/ HTTP/1.1
+PUT http://127.0.0.1:8000/store/stores/2/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0Njc3MTcwLCJpYXQiOjE3NjQ2NzY4NzAsImp0aSI6IjA4OTIzNDQ5ODA3OTQxNDViNjVkMjkwYmZiODlmYzRkIiwidXNlcl9pZCI6IjEiLCJyb2xlIjoibWVyY2hhbnQifQ.17QWu3yTdz_xwCIBSTaBbYK1fjhQ9xZq1v-WY6_Kfyo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY1NjEwNTAyLCJpYXQiOjE3NjU2MTAyMDIsImp0aSI6IjRiMmI4ZjJhMjdjZDQzZWVhZjI2ZWY0YjQwZTUzZmI4IiwidXNlcl9pZCI6IjIiLCJyb2xlIjoibWVyY2hhbnQifQ.iBTK7HV46CmIh0tLkwliij3g-oPI_kPwGSsW2XfUVe8
 
 {
-    "name": "帶帶黑狗的店",
-    "description": "這是一家黑狗帶帶很愛的店喔！",
+    "name": "有條白色領帶的黑狗的店",
+    "description": "這是一家黑狗有白色領帶很愛的店喔！",
     "address": "高雄市三民區大連街373號6樓"
 
 }
@@ -42,13 +42,13 @@ Content-Type: application/json
 ###
 POST http://127.0.0.1:8000/store/products/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY1MTg5NzMxLCJpYXQiOjE3NjUxODk0MzEsImp0aSI6IjBiODE1YzZlZTMwZjQwMmRhZDYzMGIxMzU2MzM2Yzc2IiwidXNlcl9pZCI6IjEiLCJyb2xlIjoibWVyY2hhbnQifQ.FhbNvZ9siwVBhBXMKS1cQ5OO4LA_6bB7dtOq2rXAGPY
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY1NjEzNTExLCJpYXQiOjE3NjU2MTMyMTEsImp0aSI6IjBiMjQwMDQ2MjBlMDRkNjk4ZTNkNDAzNzg3ZDgxNWE2IiwidXNlcl9pZCI6IjIiLCJyb2xlIjoibWVyY2hhbnQifQ.W2_Mw4oeE4j_dehej8VNyGKPGVVy3cZJ3Cr8-Kik_P0
 
 {
-    "name": "牛肉骰子",
-    "description": "領帶沒有很愛",
-    "price": 10.99,
-    "stock": 15
+    "name": "起司凍乾",
+    "description": "濃郁起司，狗狗peace",
+    "price": 5.99,
+    "stock": 35
 }
 
 ###
@@ -70,18 +70,20 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
 ###
 POST http://127.0.0.1:8000/store/orders/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY1MTE5Mzk3LCJpYXQiOjE3NjUxMTkwOTcsImp0aSI6IjIwMDA5YTk3M2QzMDRhYWU5ZTAwYzZkN2YwNGIxODM3IiwidXNlcl9pZCI6IjIiLCJyb2xlIjoibWVtYmVyIn0.RIHDf1XZx7hH1jBmO06Ma4_PT354hiy7ztRY3jewcU0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY1NjExMzMzLCJpYXQiOjE3NjU2MTEwMzMsImp0aSI6IjQ2ZjMwNTdhNmNmZDQxZjdhN2E0ZDVhZTM0YTA4ZTlhIiwidXNlcl9pZCI6IjMiLCJyb2xlIjoibWVtYmVyIn0.WH6pjKKZ4CHMTAQsgzkBAspafcosgLVJgG3ScO41fwc
 
 {
-    "status": "pending",
+    "receiver_name": "吳逢霖",
+    "receiver_phone": "0912345678",
+    "address": "高雄市高雄區高雄路100號",
     "items": [
         {
-            "product": 1,
-            "quantity": 2
+            "product": 2,
+            "quantity": 7
         },
         {
-            "product": 2,
-            "quantity": 1
+            "product": 4,
+            "quantity": 5
         }
     ]
 }
@@ -94,17 +96,19 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
 ###
 GET http://127.0.0.1:8000/member/members/1/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY1MTg4NTE0LCJpYXQiOjE3NjUxODgyMTQsImp0aSI6ImYxNDE5NDYyZjUwMDQ4YTI5YWJmN2FiZjJjNzg0MTMwIiwidXNlcl9pZCI6IjIiLCJyb2xlIjoibWVtYmVyIn0.VR3z1_wG9NG02xLA_SsAHBhYzi4oH1VIM8mKLXcdx50
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY1NjExOTY0LCJpYXQiOjE3NjU2MTE2NjQsImp0aSI6IjU1ZWRkMWRjM2I0MTQ1M2ZiZDcyNGViNTM0ZjhiZGY3IiwidXNlcl9pZCI6IjMiLCJyb2xlIjoibWVtYmVyIn0.BdAsj1MEeXX03_-Z-UGyuTXQrR3dQtARfTIvV2PjHzU
 
 
 ###
-PUT  http://127.0.0.1:8000/member/members/1/ HTTP/1.1
+PUT  http://127.0.0.1:8000/member/members/2/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY1MTg4MjY3LCJpYXQiOjE3NjUxODc5NjcsImp0aSI6Ijg3NDQ1OWMxY2Q1NzRmN2ZiMTMxY2UwMjJkMTY2YzM3IiwidXNlcl9pZCI6IjIiLCJyb2xlIjoibWVtYmVyIn0._DGZPppfd09Vbwr1tX_Vgk8SO8my2z-9Mivld0XGs7k
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY1NjEwODYwLCJpYXQiOjE3NjU2MTA1NjAsImp0aSI6IjY0NmExOTQ3Y2Y5ODQwZjI5NTE2ZTViMGQ1ODFiZDlkIiwidXNlcl9pZCI6IjQiLCJyb2xlIjoibWVtYmVyIn0.3WJeUcvll7StDxI5s4yZEX-NtmSEoOx-fDyEVPeZcHo
 
 {
-    "name": "吳逢霖",
-    "birthday": "1991-10-30",
-    "member_avatar": "empty.png"
+    "name": "陳小魚",
+    "birthday": "1992-09-25",
+    "member_avatar": "empty.png",
+    "address": "台南市台南區台南路100號",
+    "phone_num": "0987654321"
 
 }

@@ -136,11 +136,10 @@ class OrderCreateSerializer(serializers.ModelSerializer):
       
 
 class OrderSerializer(serializers.ModelSerializer):
-    order_number = serializers.CharField(read_only=True) # 訂單編號 
-    items = OrderItemSerializer(many=True)
-    total_price =serializers.SerializerMethodField(method_name='get_total_price') # 計算訂單總價
-    def get_total_price(self, obj):
-        return sum(item.item_subtotal for item in obj.items.all()) # 計算訂單總價
+    order_number = serializers.CharField(read_only=True) # 訂單編號
+    member = serializers.IntegerField(source='member.id', read_only=True) 
+    items = OrderItemSerializer(many=True, read_only=True)
+    total_amount = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
 
     class Meta:
         model = Order
@@ -154,7 +153,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'created_at', 
             'status', 
             'items', 
-            'total_price',
+            'total_amount',
             ]
         
 class ProductInfoSerializer(serializers.Serializer):

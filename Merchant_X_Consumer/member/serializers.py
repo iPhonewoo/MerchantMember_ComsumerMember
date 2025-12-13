@@ -74,6 +74,8 @@ class MemberSerializer(serializers.ModelSerializer):
             'name',
             'birthday',
             'member_avatar',
+            'address',
+            'phone_num',
             'orders',
             'last_update',
             'member_points',

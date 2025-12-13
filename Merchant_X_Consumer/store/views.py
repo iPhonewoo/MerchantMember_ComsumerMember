@@ -35,6 +35,7 @@ from datetime import datetime
 class StoreViewSet(viewsets.ModelViewSet):
     queryset = Store.objects.all()
     serializer_class = StoreSerializer
+    pagination_class = PageNumberPagination
     
     def get_permissions(self):
         if self.action == 'create':

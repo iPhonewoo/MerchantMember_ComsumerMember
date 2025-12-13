@@ -9,7 +9,7 @@ from member.models import User, Member, Merchant
 
 # Create your models here.
 def generate_order_number():
-    today = datetime.date.today().strftime('%Y%m%d')
+    today = datetime.now().strftime('%Y%m%d')
     random_digits = str(random.randint(100000, 999999))
     return f"ORD{today}-{random_digits}"
 
@@ -128,7 +128,7 @@ class OrderItem(models.Model):
 
     @property
     def item_subtotal(self):
-        return self.product * Decimal(self.quantity)
+        return self.product.price * Decimal(self.quantity)
     
     def __str__(self):
         return f"{self.quantity} x {self.product.name} @ {self.price_at_purchase} in Order {self.order.id}"
