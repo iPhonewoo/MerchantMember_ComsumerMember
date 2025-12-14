@@ -62,15 +62,21 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         fields = [
             'order_number',
             'member',
+            'status',
+            'payment_method',
             'receiver_name',
             'receiver_phone',
             'address',
             'note', 
-            'items', 
+            'items',
+            'total_amount', 
         ]
         read_only_fields = [
             'order_number',
             'member',
+            'status',
+            'total_amount',
+            'payment_method',
         ]
     order_number = serializers.CharField(read_only=True)
     items = OrderItemCreateSerializer(many=True, required=True) # 嵌套的OrderItem序列化器，用於建立訂單時使用
@@ -157,13 +163,14 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = [
             'order_number',
-            'member', 
+            'member',
+            'status', 
+            'payment_method',
             'receiver_name',
             'receiver_phone',
             'address',
             'note',
-            'created_at', 
-            'status', 
+            'created_at',  
             'items', 
             'total_amount',
             ]
