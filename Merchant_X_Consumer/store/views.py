@@ -2,10 +2,11 @@ from django.db.models import Max  # 用於聚合查詢
 from django.shortcuts import get_object_or_404  # 用於取得物件或回傳404錯誤
 from django_filters.rest_framework import \
     DjangoFilterBackend  # 使用Django Filter進行過濾
-from rest_framework import viewsets  # 此功能可包含所有CRUD且自動處理路由
 from rest_framework.decorators import action  # 用於在ViewSet中定義自訂動作
 from rest_framework import (filters,  # 使用Django REST framework的通用視圖和過濾器
-                            generics)
+                            generics,
+                            status,
+                            viewsets)
 from rest_framework.decorators import \
     api_view  # 使用Django REST framework的api_view裝飾器
 from rest_framework.pagination import (LimitOffsetPagination,  # 分頁類別
@@ -21,14 +22,14 @@ from store.filter import (InStockFilterBackend, OrderFilter,  # 自定義的過�
                           ProductFilter)
 from store.models import Store, Order, OrderItem, Product
 from store.serializers import (StoreSerializer, OrderSerializer, ProductInfoSerializer,
-                               ProductSerializer, OrderCreateSerializer)
+                               ProductSerializer, OrderCreateSerializer, OrderUpdateSerializer)
 from member.permissions import (IsMerchant, 
                                 IsMember, 
                                 IsOwnerOfStore, 
                                 IsOwnerOfOrder, 
                                 IsOwnerOfMemberProfile, 
                                 IsOwnerOfProduct)
-from rest_framework.exceptions import PermissionDenied # 用於權限拒絕例外
+from rest_framework.exceptions import ValidationError, PermissionDenied # 用於權限拒絕例外
 from datetime import datetime
 
 # Create your views here.
@@ -92,18 +93,41 @@ class ProductViewSet(viewsets.ModelViewSet):
         serializer.save() # 儲存更新的產品資料
 
 
-class OrderCreateAPIView(generics.CreateAPIView):
+class OrderListCreateAPIView(generics.ListCreateAPIView):
     queryset = Order.objects.prefetch_related('items__product')
-    serializer_class = OrderCreateSerializer
-    permission_classes = [IsAuthenticated, IsMember]
 
-    def perform_create(self, serializer):
-        serializer.save(member=self.request.user.member)
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return[IsAuthenticated(), IsMember()]
+        return [IsAuthenticated()]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return OrderCreateSerializer
         return OrderSerializer
+    
+    def perform_create(self, serializer):
+        serializer.save(member=self.request.user.member)
+
+    def get_queryset(self):
+        user =self.request.user
+
+        if not user.is_authenticated:
+            return Order.objects.none()
+        
+        if user.role == 'member':
+            return Order.objects.filter(member=user.member).prefetch_related('items__product')
+        
+        if user.role == 'merchant':
+            try:
+                store = user.merchant.store
+                return Order.objects.filter(
+                    item__product__store=store
+                ).distinct().prefetch_related('items__product')
+            except Store.DoesNotExist:
+                return Order.objects.none()
+            
+        return Order.objects.all().prefetch_related('items__product')
     
 
 class OrderDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
@@ -117,7 +141,7 @@ class OrderDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
-            return OrderCreateSerializer
+            return OrderUpdateSerializer
         return OrderSerializer
     
     def perform_update(self, serializer):
@@ -135,12 +159,98 @@ class OrderDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
         if user.role == 'merchant':
             try:
                 store = user.merchant.store
-                return Order.objects.filter(items__product__store=store).distinct() #商家只能看到有自己商品的訂單
+                return Order.objects.filter(
+                    items__product__store=store
+                ).distinct() #商家只能看到有自己商品的訂單
             except Store.DoesNotExist:
                 return Order.objects.none() # 商家無商店無法查看訂單
             
         return Order.objects.all() # 管理員可以看到所有訂單
 
+
+class OrderPayAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOfOrder]
+
+    def post(self, request, pk):
+        order = get_object_or_404(Order, pk=pk)
+        self.check_object_permissions(request, order)
+
+        new_status = Order.StatusChoices.PAID
+
+        if not order.can_transition(new_status):
+            raise ValidationError(
+                f"訂單無法從 {order.status} 改為 {new_status} !"
+            )
+        
+        order.status = new_status
+        order.payment_method = request.data.get(
+            'payment_method', Order.PaymentMethodChoices.UNPAID
+        ) 
+        order.paid_at = datetime.now()
+        order.save()
+
+        return Response(
+            {"detail": "付款成功", "status": order.status},
+            status=status.HTTP_200_OK
+        )
+
+
+class OrderShipAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsMerchant]
+
+    def post(self, request, pk):
+        order = get_object_or_404(Order, pk=pk)
+
+        try:
+            store = request.user.merchant.store
+        except Store.DoesNotExist:
+            raise PermissionDenied("您尚未創建商店哦！")
+        
+        has_own_product = Order.objects.filter(
+            pk=pk,
+            items__product__store=store
+        ).exists()
+
+        if not has_own_product:
+            raise PermissionDenied("此單並無您商店的商品，無法出貨！")
+
+        new_status =Order.StatusChoices.SHIPPED
+
+        if not order.can_transition(new_status):
+            raise ValidationError(
+                f"訂單無法從 {order.status} 改為 {new_status} !"
+            )
+        
+        order.status = new_status
+        order.save()
+
+        return Response(
+            {"detail": "出貨成功", "status": order.status},
+            status=status.HTTP_200_OK
+        )
+
+
+class OrderCancelAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOfOrder]
+
+    def post(self, request, pk):
+        order = get_object_or_404(Order, pk=pk)
+        self.check_object_permissions(request, order)
+
+        new_status = Order.StatusChoices.CANCELED
+
+        if not order.can_transition(new_status):
+            raise ValidationError(
+                f"訂單無法從 {order.status} 改為 {new_status} !"
+            )
+        
+        order.status = new_status
+        order.save()
+
+        return Response(
+            {"detail": "訂單已取消", "status": order.status},
+            status=status.HTTP_200_OK
+        )
 
 class ProductInfoAPIView(APIView):
     def get(self, request):

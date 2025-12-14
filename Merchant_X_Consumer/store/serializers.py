@@ -7,7 +7,7 @@ from decimal import Decimal
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    store_name = serializers.CharField(source='store.store_name', read_only=True) # 取得關聯的Store名稱
+    store_name = serializers.CharField(source='store.name', read_only=True) # 取得關聯的Store名稱
     class Meta:
         model = Product
         fields = ['description', 'name', 'price', 'stock', 'store_name']
@@ -66,7 +66,6 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             'receiver_phone',
             'address',
             'note', 
-            'status', 
             'items', 
         ]
         read_only_fields = [
@@ -75,23 +74,6 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         ]
     order_number = serializers.CharField(read_only=True)
     items = OrderItemCreateSerializer(many=True, required=True) # 嵌套的OrderItem序列化器，用於建立訂單時使用
-
-    def update(self, instance, validated_data):
-        new_status = validated_data.get('status') 
-        if new_status:
-            if not instance.can_transition(new_status):
-                raise ValidationError(
-                    f"訂單無法從 {instance.status} 改為 {new_status} !"
-                ) # 驗證訂單狀態的轉換正常
-            instance.status = new_status
-        
-        instance.receiver_name = validated_data.get('receiver_name', instance.receiver_name)
-        instance.receiver_phone = validated_data.get('receiver_phone', instance.receiver_phone)
-        instance.address = validated_data.get('address', instance.address)
-        instance.note = validated_data.get('note', instance.note)
-
-        instance.save()
-        return instance
          
     def create(self, validated_data):
         orderitem_data = validated_data.pop('items',[]) # 從validated_data中取出子資料(validated_data是DRF中已驗證過的dict資料)
@@ -134,6 +116,36 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 
         return order # 回傳給前端主資料訂單(已經包含子資料訂單)
       
+
+class OrderUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = [
+            'receiver_name',
+            'receiver_phone', 
+            'address', 
+            'note', 
+            'status'
+        ]
+
+    def update(self, instance, validated_data):
+        new_status = validated_data.get('status') 
+        if new_status:
+            if not instance.can_transition(new_status):
+                raise ValidationError(
+                    f"訂單無法從 {instance.status} 改為 {new_status} !"
+                ) # 驗證訂單狀態的轉換正常
+            instance.status = new_status
+        
+        instance.receiver_name = validated_data.get('receiver_name', instance.receiver_name)
+        instance.receiver_phone = validated_data.get('receiver_phone', instance.receiver_phone)
+        instance.address = validated_data.get('address', instance.address)
+        instance.note = validated_data.get('note', instance.note)
+
+        instance.save()
+        return instance
+
+
 
 class OrderSerializer(serializers.ModelSerializer):
     order_number = serializers.CharField(read_only=True) # 訂單編號

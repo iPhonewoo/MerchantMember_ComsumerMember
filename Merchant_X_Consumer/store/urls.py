@@ -6,9 +6,12 @@ from rest_framework.routers import DefaultRouter # 使用Django REST framework�
 
 urlpatterns = [
     path("products/info/", store_views.ProductInfoAPIView.as_view(), name="product_info"),
-    path("orders/", store_views.OrderCreateAPIView.as_view(), name="order_list"),
+    path("orders/", store_views.OrderListCreateAPIView.as_view(), name="order_list_create"),
     path("orders/<int:pk>/", store_views.OrderDetailAPIView.as_view(), name="order_detail"),
-    # path("user-orders/", store_views.UserOrderListAPIView.as_view(), name="user-orders"),   
+    path("orders/<int:pk>/pay/", store_views.OrderPayAPIView.as_view(), name="order_pay"),
+    path("orders/<int:pk>/ship/", store_views.OrderShipAPIView.as_view(), name="order_ship"),
+    path("orders/<int:pk>/cancel/", store_views.OrderCancelAPIView.as_view(), name="order_cancel"),
+
 ]
 
 router = DefaultRouter()

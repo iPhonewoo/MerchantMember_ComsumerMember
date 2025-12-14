@@ -128,7 +128,7 @@ class OrderItem(models.Model):
 
     @property
     def item_subtotal(self):
-        return self.product.price * Decimal(self.quantity)
+        return self.price_at_purchase * Decimal(self.quantity)
     
     def __str__(self):
         return f"{self.quantity} x {self.product.name} @ {self.price_at_purchase} in Order {self.order.id}"
