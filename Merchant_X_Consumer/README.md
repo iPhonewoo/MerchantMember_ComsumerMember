@@ -1,64 +1,57 @@
-Merchant X Consumer — 多商家 & 會員後端系統 API
+# Merchant X Consumer API
 
-本專案是一個以 Django 5 + Django REST Framework 建構的
-多商家（Marketplace）＋ 會員系統（Member System）
-後端 API。
+一個簡單的「多商家 x 會員」電商後端專案，使用 **Django + Django REST Framework** 實作，包含：
 
-支援：
+- 使用者註冊 / 登入（JWT）
+- 會員 / 商家角色分離
+- 商店管理、商品管理
+- 訂單建立 / 查詢 / 狀態更新
+- 權限控管與訂單狀態機制
 
-會員註冊 / 登入 / 個資管理
+---
 
-商家申請 / 商店建立
+## 技術棧
 
-商品管理（商品 CRUD、權限保護、店家綁定）
+- Python 3.x
+- Django
+- Django REST Framework
+- djangorestframework-simplejwt
+- django-filter
+- drf-spectacular（自動產生 OpenAPI / Swagger 文件）
+- SQLite（開發環境）
 
-訂單系統（會員下單、商家查看、自動關聯商品）
+---
 
-角色權限控管（Admin / Merchant / Member）
+## 專案結構（擷取重點）
 
-Owner-Based Permission（只能操作自己的資料）
-
-Token 驗證（可改 JWT）
-
-適用於：
-
-電商平台
-
-多商家上架商品的 marketplace
-
-學習後端架構專案
-
-接案作品集
-
-📁 專案目錄結構
+```text
 Merchant_X_Consumer/
-│
-├── config/                  # Django 專案設定
-│
-├── member/                  # 會員模型與 API
-│   ├── models.py
-│   ├── serializers.py
-│   ├── views.py
-│
-├── merchant/                # 商家模型與 API
-│
-├── store/                   # 商店與商品管理
-│   ├── models.py
-│   ├── serializers.py
-│   ├── views.py
-│
-├── order/                   # 訂單管理
-│
-├── requirements.txt         # 套件列表（建議加入）
+├── member/
+│   ├── models.py       # User / Member / Merchant
+│   ├── serializers.py  # Register / Login / MemberSerializer
+│   ├── views.py        # 註冊、登入、會員 Profile API
+│   ├── permissions.py  # 角色 & 擁有者權限
+│   └── urls.py
+├── store/
+│   ├── models.py       # Store / Product / Order / OrderItem
+│   ├── serializers.py  # Product / Store / Order 序列化
+│   ├── views.py        # 商店、商品、訂單 API
+│   ├── filter.py       # 產品篩選相關
+│   └── urls.py
+├── config/
+│   ├── settings.py
+│   ├── urls.py
+│   └── ...
 └── README.md
+
+
 🔐 使用者角色說明
-角色	能力
-| 角色                | 能力                  |
-| --------------------| ------------------------------------|
-| **Admin**           | 管理所有資料、查看全部會員、商家、訂單 |
-| **Merchant（商家）** | 建立商店、管理商店資訊、管理自己的商品 |
-| **Member（會員）**   | 註冊、登入、編輯個資、購買商品        |
-| **訪客**             | 只能瀏覽公開商品與商店               |
+| 角色                | 能力                                               |
+| --------------------| --------------------------------------------------|
+| **Admin**           | 可在 Django admin 後台管理所有資料                  |
+| **Merchant（商家）** | 可以管理自己商店 & 商品、查看包含自己商品的訂單、出貨 |
+| **Member（會員）**   | 可以下單、查看自己的訂單、查看產品                   |
+| **訪客**             | 只能瀏覽公開商品與商店                             |
 
 🧩 資料庫 ERD
 
@@ -80,59 +73,73 @@ User (Django auth user)
                     └── OrderItem (Many)
                            │
                            └── Order (Many-to-Many through OrderItem)
-🔧 安裝方式
-git clone https://github.com/iPhonewoo/MerchantMember_ComsumerMember.git
-cd MerchantMember_ComsumerMember/Merchant_X_Consumer
-
-# 建立虛擬環境
+🔧 安裝與啟動
+# 1. 建立虛擬環境
 python -m venv venv
-source venv/bin/activate  # Windows 使用 venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# 安裝套件
+# 2. 安裝套件
 pip install -r requirements.txt
-pip freeze > requirements.txt
 
-# 建立資料庫
+# 3. 建立資料庫
 python manage.py migrate
 
-# 啟動伺服器
+# 4. 建立超級管理員（可選）
+python manage.py createsuperuser
+
+# 5. 啟動開發伺服器
 python manage.py runserver
+
+JWT 認證流程
+
+1. 註冊帳號
+
+2. 使用 /member/login/ 取得 access & refresh token
+
+3. 呼叫需要登入的 API，在 Header 加上：
+  Authorization: Bearer <your_access_token>
+
+
 📘 API 文件
 🔑 Auth
-| Method | Endpoint         | 說明         |
+| Method | Path         | 說明         |
 | ------ | ---------------- | ---------- |
-| POST   | `/api/register/` | 註冊         |
-| POST   | `/api/login/`    | 登入取得 Token |
+| POST   | `/member/register/` | 註冊         |
+| POST   | `/member/login/`    | 登入取得 Token |
 👤 Member API
-| Method | Endpoint             | 說明             |
+| Method | Path             | 說明             |
 | ------ | -------------------- | -------------- |
-| GET    | `/api/members/{id}/` | 查看自己的會員資料（需登入） |
-| PATCH  | `/api/members/{id}/` | 更新自己的資料        |
-| PUT    | `/api/members/{id}/` | 完整更新資料         |
-🔒 權限：
+| GET    | `/member/members/{id}/` | 查看自己的會員資料（需登入） |
+| PATCH  | `/member/members/{id}/` | 更新自己的資料        |
+| PUT    | `/member/members/{id}/` | 完整更新資料         |
+Order API
+| Method | Path                         | 說明                | 權限                    |
+| ------ | ---------------------------- | ----------------- | --------------------- |
+| POST   | `/store/orders/`             | 建立訂單              | 已登入會員 (`member`)      |
+| GET    | `/store/orders/`             | 查看訂單列表            | 已登入會員/商家/管理員          |
+| GET    | `/store/orders/{id}/`        | 查看單筆訂單詳細          | 該會員自身 / 該訂單相關商家 / 管理員 |
+| PATCH  | `/store/orders/{id}/`        | 更新收件資料或狀態         | 訂單本人（收件資料）、商家 (部分情境)  |
+| DELETE | `/store/orders/{id}/`        | 取消 / 刪除訂單         | 訂單本人 / 管理員            |
+| POST   | `/store/orders/{id}/pay/`    | 付款（狀態改為 paid）     | 該訂單會員本人               |
+| POST   | `/store/orders/{id}/ship/`   | 出貨（狀態改為 shipped）  | 擁有該訂單商品的商家            |
+| POST   | `/store/orders/{id}/cancel/` | 取消訂單（改為 canceled） | 該訂單會員本人               |
 
-只能查看自己的資料（OwnerOnly）
-
-不可查看其他會員（避免個資外洩）
-
-不可用 ViewSet 建立 Member（註冊 API 已處理）
-
-🏬 Store（商店）
-| Method | Endpoint            | 說明              |
-| ------ | ------------------- | --------------- |
-| POST   | `/api/stores/`      | 商家建立商店（每商家只能一間） |
-| GET    | `/api/stores/`      | 查看所有商店          |
-| GET    | `/api/stores/{id}/` | 查看單一商店          |
-| PATCH  | `/api/stores/{id}/` | 商家修改自己的商店       |
-| DELETE | `/api/stores/{id}/` | 刪除（限 owner）     |
-📦 Product（商品）
-| Method | Endpoint              | 說明     |
-| ------ | --------------------- | ------ |
-| POST   | `/api/products/`      | 商家新增商品 |
-| GET    | `/api/products/`      | 查看商品列表 |
-| GET    | `/api/products/{id}/` | 查看商品詳情 |
-| PATCH  | `/api/products/{id}/` | 商家修改商品 |
-| DELETE | `/api/products/{id}/` | 商家刪除商品 |
+🏬 Store API
+| Method | Path                  | 說明              |
+| ------ | --------------------- | ----------------- |
+| POST   | `/store/stores/`      | 商家建立商店（每商家只能一間） |
+| GET    | `/store/stores/`      | 查看所有商店          |
+| GET    | `/store/stores/{id}/` | 查看單一商店          |
+| PATCH  | `/store/stores/{id}/` | 商家修改自己的商店       |
+| DELETE | `/store/stores/{id}/` | 刪除（限 owner）     |
+📦 Product API
+| Method | Path                    | 說明     |
+| ------ | ----------------------- | -------- |
+| POST   | `/store/products/`      | 商家新增商品 |
+| GET    | `/store/products/`      | 查看商品列表 |
+| GET    | `/store/products/{id}/` | 查看商品詳情 |
+| PATCH  | `/store/products/{id}/` | 商家修改商品 |
+| DELETE | `/store/products/{id}/` | 商家刪除商品 |
 🛒 Order API（開發中）
 
 🚀 API Request / Response 範例
@@ -488,12 +495,13 @@ Success Response
 {
   "order_number": "ORD20250225-00123",
   "member": 17,
+  "status": "pending",
+  "payment_method": "unpaid",
   "receiver_name": "王小明",
   "receiver_phone": "0912345678",
   "address": "台北市信義區松智路 1 號",
   "note": "請於晚上 6 點後送達",
   "created_at": "2025-02-25T10:32:11Z",
-  "status": "pending",
   "items": [
     {
       "product_name": "高山烏龍茶禮盒",
@@ -529,11 +537,12 @@ Success Response
 {
   "order_number": "ORD20250225-00124",
   "member": 17,
+  "status": "pending",
+  "payment_method": "unpaid",
   "receiver_name": "王小明",
   "receiver_phone": "0912345678",
   "address": "台北市信義區松智路 1 號",
   "note": "請用紙箱包裝",
-  "status": "pending",
   "items": [
     {
       "product_name": "高山烏龍茶禮盒",
@@ -562,12 +571,13 @@ Success Response
 {
   "order_number": "ORD20250225-00124",
   "member": 17,
+  "status": "pending",
+  "payment_method": "unpaid",
   "receiver_name": "王小明",
   "receiver_phone": "0912345678",
   "address": "台北市大安區忠孝東路三段 200 號",
   "note": "請用紙箱包裝",
   "created_at": "2025-02-25T10:35:14Z",
-  "status": "pending",
   "items": [
     {
       "product_name": "高山烏龍茶禮盒",
@@ -597,6 +607,30 @@ Success Response
   "total_amount": "1400.00"
 }
 
+## 狀態變更 action
+### 14 付款
+
+POST /store/orders/{id}/pay/
+{
+  "detail": "付款成功",
+  "status": "paid"
+}
+
+出貨
+POST /store/orders/{id}/ship/
+
+{
+  "detail": "出貨狀態已更新",
+  "status": "shipped"
+}
+
+取消訂單
+POST /store/orders/{id}/cancel/
+
+{
+  "detail": "訂單已取消",
+  "status": "canceled"
+}
 
 
 
