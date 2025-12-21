@@ -636,7 +636,7 @@ POST /store/orders/{id}/cancel/
 
 🧪 測試 Test（即將完成）
 
-📌 專案 Roadmap（即將進行）
+📌 專案 Roadmap（準備進行）
  完整訂單 API
 
  JWT Token 統一登入
