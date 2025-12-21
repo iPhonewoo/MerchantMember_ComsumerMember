@@ -48,6 +48,6 @@ jobs:
 
       - name: Run tests
         env:
-          DJANGO_SETTINGS_MODULE: config.settings
+          DJANGO_SETTINGS_MODULE: Merchant_X_Consumer.settings
         run: |
           pytest
