@@ -107,3 +107,6 @@ wheel==0.41.2
 win-inet-pton @ file:///D:/bld/win_inet_pton_1667051142467/work
 wsproto==1.2.0
 zstandard==0.19.0
+pytest==9.0.2
+pytest-django==4.11.1
+factory_boy==3.3.3

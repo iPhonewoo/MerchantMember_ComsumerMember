@@ -6,11 +6,12 @@ from store.models import Store
 
 User = get_user_model()
 
+
 @pytest.fixture
 def api_client():
     """
-    建立 DRF 專用的 API 測試 client。
-    之後測試 POST/GET API 都用它發送。
+    共用的 DRF APIClient。
+    之後所有測試要打 /member/...、/store/... API，都用這個。
     """
     return APIClient()
 
@@ -18,20 +19,20 @@ def api_client():
 @pytest.fixture
 def create_member_user():
     """
-    建立一組「會員帳號 + Member Profile」的測試資料。
-    為什麼用函式再回傳？因為 fixture 可以重複產生多組不互相干擾的資料。
+    產生「一個 user + 一個 Member」的測試資料。
+
+    用法：
+        user, member = create_member_user()
     """
-    def _create():
-        # 建 user
+    def _create(username="member1"):
         user = User.objects.create_user(
-            username="member1",
+            username=username,
             password="test1234",
-            role="member"
+            role="member",
         )
-        # 一對一 Member profile
         member = Member.objects.create(
             user=user,
-            name="測試會員",
+            name=f"{username}-name",
         )
         return user, member
 
@@ -41,22 +42,25 @@ def create_member_user():
 @pytest.fixture
 def create_merchant_user():
     """
-    建立一組「商家 user + merchant profile + 商店」。
-    讓測試建立產品 / 查看訂單時不必每次都手動建資料。
+    產生「一個商家 user + 一個 Merchant + 一個 Store」。
+
+    用法：
+        user, merchant, store = create_merchant_user()
     """
-    def _create():
+    def _create(username="merchant1"):
         user = User.objects.create_user(
-            username="merchant1",
+            username=username,
             password="test1234",
-            role="merchant"
+            role="merchant",
         )
         merchant = Merchant.objects.create(user=user)
         store = Store.objects.create(
             merchant=merchant,
-            name="測試商店",
-            address="地址",
-            description="描述"
+            name=f"{username} 的商店",
+            address="高雄市某處",
+            description="測試商店",
         )
         return user, merchant, store
 
     return _create
+
