@@ -646,6 +646,53 @@ POST /store/orders/{id}/cancel/
  Swagger / drf-spectacular
 
  Docker 部署
+🐳 Docker 開發流程（Development with Docker）
+
+本專案使用 Docker + Docker Compose 作為主要開發與測試環境，確保：
+
+1. 本機環境一致
+2. CI / CD 與本地行為相同
+3. 降低「我本機可以、你那邊不行」的風險
+
+🔧 環境需求
+
+1. Docker Desktop
+2. Docker Compose（v2）
+
+🚀 啟動專案（第一次或 Docker 設定有變更）
+
+docker compose up --build
+
+或背景執行：
+docker compose up -d --build
+
+🗄️ 資料庫遷移（在容器內）
+
+docker compose exec web python manage.py migrate
+
+🧪 執行測試（推薦方式）
+
+docker compose exec web pytest
+⚠️ 請勿直接在本機執行 pytest
+Django 專案實際執行環境為 Docker container
+
+🛑 停止服務
+
+docker compose down
+
+🧠 為什麼使用 Docker？
+
+1. 保證開發、測試、部署環境一致
+2. 新成員可快速啟動專案
+3. CI（GitHub Actions）可無縫接軌
+
+🧩 Docker + CI（GitHub Actions）
+
+本專案已設定 GitHub Actions：
+
+1. 每次 push / pull request 自動執行測試
+2. 驗證 migration + pytest 是否通過
+3. 作為品質保證（Quality Gate）
 
  ERD 圖正式化
 
