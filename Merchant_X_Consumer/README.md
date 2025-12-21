@@ -634,7 +634,7 @@ POST /store/orders/{id}/cancel/
 
 
 
-🧪 測試 Test（待補）
+🧪 測試 Test（即將完成）
 
 📌 專案 Roadmap（即將進行）
  完整訂單 API
