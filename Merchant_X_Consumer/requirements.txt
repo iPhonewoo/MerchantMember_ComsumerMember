@@ -9,3 +9,5 @@ pytest>=9.0,<10.0
 pytest-django>=4.8,<5.0
 factory_boy>=3.3,<4.0
 gunicorn
+dj-database-url
+psycopg2-binary
