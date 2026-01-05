@@ -1,61 +1,87 @@
-# Merchant X Consumer API
-
-  一個簡單的「多商家 x 會員」電商後端專案，使用 **Django + Django REST Framework** 實作，包含：
-    A. 使用者註冊 / 登入（JWT）
-    B. 會員 / 商家角色分離
-    C. 商店管理、商品管理
-    D. 訂單建立 / 查詢 / 狀態更新
-    E. 權限控管與訂單狀態機制
+Merchant X Consumer API
+  一個「多商家 x 會員」的電商後端 API 專案，使用 Django + Django REST Framework 實作，
+  以實際商業系統為設計目標，涵蓋角色建立及權限、訂單流程、狀態機、測試與部署。
 
 ---
 
-## 技術棧
+技術棧
+  Core Backend
+    1. Python 3.11
+    2. Django
+    3. Django REST Framework
 
-  - Python 3.x
-  - Django
-  - Django REST Framework
-  - djangorestframework-simplejwt
-  - django-filter
-  - drf-spectacular（自動產生 OpenAPI / Swagger 文件）
-  - SQLite（開發環境）
+  Authentication / Authorization
+    1. JWT Authentication (djangorestframework-simplejwt)
+    2. Custom Permission Classes（Role-based & Object-level）
+
+  API Tooling
+    1. django-filter
+    2. drf-spectacular (OpenAPI / Swagger)
+
+  Database
+    1. SQLite（Local Development）
+    2. PostgreSQL（Production / Render）
+    - Database configuration is environment-based (12-factor app compliant)
+
+  Testing
+    1. pytest
+    2. pytest-django
+    3. factory_boy
+
+  CI
+    GitHub Actions
+
+  Containerization
+    1. Docker
+    2. Docker Compose (local development & CI alignment)
 
 ---
 
-## 專案結構
+專案結構（依責任劃分，符合 Django app best practices）
+.github/workflows/tests.yml   # GitHub Actions CI pipeline
+Merchant_X_Consumer/
+├── member/
+│   └── ...
+├── store/
+│   └── ...
+├── Merchant_X_Consumer/
+│   └── settings.py
+├── tests/                    
+│   ├── conftest.py
+│   ├── factories/
+│   │   ├── user_factory.py
+│   │   ├── store_factory.py
+│   │   ├── product_factory.py
+│   │   └── order_factory.py
+│   ├── members/
+│   │   ├── test_member_login.py
+│   │   └── test_member_profile.py
+│   ├── stores/
+│   │   ├── test_product_crud.py
+│   │   └── test_store_crud.py
+│   └── orders/
+│       ├── test_order_create.py
+│       ├── test_order_permissions.py
+│       └── test_order_update.py
+├── docker-compose.yml
+├── Dockerfile
+├── pytest.ini
+├── requirements.txt
+└── README.md
 
-  ```text
-  Merchant_X_Consumer/
-  ├── member/
-  │   ├── models.py       # User / Member / Merchant
-  │   ├── serializers.py  # Register / Login / MemberSerializer
-  │   ├── views.py        # 註冊、登入、會員 Profile API
-  │   ├── permissions.py  # 角色 & 擁有者權限
-  │   └── urls.py
-  ├── store/
-  │   ├── models.py       # Store / Product / Order / OrderItem
-  │   ├── serializers.py  # Product / Store / Order 序列化
-  │   ├── views.py        # 商店、商品、訂單 API
-  │   ├── filter.py       # 產品篩選相關
-  │   └── urls.py
-  ├── config/
-  │   ├── settings.py
-  │   ├── urls.py
-  │   └── ...
-  └── README.md
-
+---
 
 使用者角色說明
-
   | 角色                | 能力                                               |
   | --------------------| --------------------------------------------------|
-  | **Admin**           | 可在 Django admin 後台管理所有資料                  |
-  | **Merchant（商家）** | 可以管理自己商店 & 商品、查看包含自己商品的訂單、出貨 |
-  | **Member（會員）**   | 可以下單、查看自己的訂單、查看產品                   |
-  | **訪客**             | 只能瀏覽公開商品與商店                             |
+  | Admin               | 可在 Django admin 後台管理所有資料                  |
+  | Merchant（商家）     | 可以管理自己商店 & 商品、查看包含自己商品的訂單、出貨 |
+  | Member（會員）       | 可以下單、查看自己的訂單、查看產品                   |
+  | 訪客                 | 只能瀏覽公開商品與商店                             |
 
+---
 
 資料庫 ERD
-
   以下是目前模型結構：
   User (Django auth user)
   │
@@ -75,34 +101,37 @@
                             │
                             └── Order (Many-to-Many through OrderItem)
 
+---
 
 安裝與啟動
-  # 1. 建立虛擬環境
+  1. 建立虛擬環境
     python -m venv venv
     source venv/bin/activate  # Windows: venv\Scripts\activate
 
-  # 2. 安裝套件
+  2. 安裝套件
     pip install -r requirements.txt
 
-  # 3. 建立資料庫
+  3. 建立資料庫
     python manage.py migrate
 
-  # 4. 建立超級管理員（可選）
+  4. 建立超級管理員（可選）
     python manage.py createsuperuser
 
-  # 5. 啟動開發伺服器
+  5. 啟動開發伺服器
     python manage.py runserver
 
+---
 
 JWT 認證流程
-
   1. 註冊帳號
   2. 使用 /member/login/ 取得 access & refresh token
   3. 呼叫需要登入的 API，在 Header 加上：
     Authorization: Bearer <your_access_token>
 
+---
 
 API 文件
+Complete API documentation is available via Swagger (drf-spectacular)
   Auth
     | Method | Path         | 說明         |
     | ------ | ---------------- | ---------- |
@@ -146,6 +175,7 @@ API 文件
     | POST   | `/store/orders/{id}/ship/`   | 出貨（狀態改為 shipped）  | 擁有該訂單商品的商家            |
     | POST   | `/store/orders/{id}/cancel/` | 取消訂單（改為 canceled） | 該訂單會員本人               |
 
+---
 
 API Request / Response 範例
   ##  Auth 認證 API
@@ -179,8 +209,7 @@ API Request / Response 範例
 
         Success Response
         {
-          "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NTI3NDM2NywiaWF0IjoxNzY1MTg3OTY3LCJqdGkiOiI1YmJiMzI1OGU4ZjA0ODMxYjZlNjAxZDNiYTZkZDE1ZiIsInVzZXJfaWQiOiIyIiwicm9sZSI6Im1lbWJlciJ9.WjygWAY90Fn09n9_XnjaFkvVRdAPR0S9sAJTbduq1tM",
-          "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY1MTg4MjY3LCJpYXQiOjE3NjUxODc5NjcsImp0aSI6Ijg3NDQ1OWMxY2Q1NzRmN2ZiMTMxY2UwMjJkMTY2YzM3IiwidXNlcl9pZCI6IjIiLCJyb2xlIjoibWVtYmVyIn0._DGZPppfd09Vbwr1tX_Vgk8SO8my2z-9Mivld0XGs7k",
+          "access": "<jwt_access_token>",
           "username": "john123",
           "role": "member"
         }
@@ -200,27 +229,7 @@ API Request / Response 範例
           "orders": [
             {
               "order_number": "ORD20251213-779524",
-              "member": 1,
-              "receiver_name": "John",
-              "receiver_phone": "0912345678",
-              "address": "高雄市高雄區高雄路100號",
-              "note": "",
-              "created_at": "2025-12-07T22:52:16.966555+08:00",
               "status": "pending",
-              "items": [
-                {
-                  "product_name": "Q彈潔牙骨",
-                  "product_price": "2.99",
-                  "quantity": 2,
-                  "item_subtotal": 5.98
-                },
-                {
-                  "product_name": "雞肉鴨肉狗糧",
-                  "product_price": "6.99",
-                  "quantity": 1,
-                  "item_subtotal": 6.99
-                }
-              ],
               "total_price": 12.97
             }
           ],
@@ -277,6 +286,11 @@ API Request / Response 範例
           "last_loginDate": "2025-12-08T18:03:34.595867+08:00"
         }
 
+        403 Forbidden(非該會員修改該會員資料)
+        {
+          "detail": "You do not have permission to perform this action."
+        }
+
   ## Store 商店 API
     ### 5 商家建立商店
       POST /store/stores/
@@ -299,73 +313,6 @@ API Request / Response 範例
           "created_at": "2025-12-02T19:57:27.396909+08:00",
           "last_update": "2025-12-02T20:05:23.037647+08:00",
           "products": []
-        }
-
-    ### 6 查看商店列表（公開）
-      GET /store/stores/
-        Success Response
-        {
-          "count": 2,
-          "next": null,
-          "previous": null,
-          "results": [
-            {
-              "merchant": 1,
-              "name": "帶帶黑狗的店",
-              "description": "這是一家黑狗帶帶很愛的店喔！",
-              "address": "高雄市高雄區高雄街10號10樓",
-              "created_at": "2025-12-13T15:13:04.136497+08:00",
-              "last_update": "2025-12-13T15:15:19.303452+08:00",
-              "products": [
-                {
-                  "description": "領帶沒有很愛",
-                  "name": "牛肉骰子",
-                  "price": "10.99",
-                  "stock": 12
-                },
-                {
-                  "description": "含有豐富雞肉與鴨肉的狗糧",
-                  "name": "羈押狗糧",
-                  "price": "7.99",
-                  "stock": 0
-                },
-                {
-                  "description": "讓帶帶牙齒乾淨溜溜的潔牙骨",
-                  "name": "Q彈潔牙骨",
-                  "price": "5.99",
-                  "stock": 20
-                },
-                {
-                  "description": "讓皮膚發亮的狗糧",
-                  "name": "鮭魚凍乾糧",
-                  "price": "7.99",
-                  "stock": 13
-                }
-              ]
-            },
-            {
-              "merchant": 2,
-              "name": "有條白色領帶的黑狗的店",
-              "description": "這是一家黑狗有白色領帶很愛的店喔！",
-              "address": "高雄市高雄區高雄街20號10樓",
-              "created_at": "2025-12-13T15:13:04.136497+08:00",
-              "last_update": "2025-12-13T15:17:47.797501+08:00",
-              "products": [
-                {
-                  "description": "濃郁奶香Q彈潔牙骨",
-                  "name": "牛奶潔牙骨",
-                  "price": "6.99",
-                  "stock": 23
-                },
-                {
-                  "description": "濃郁起司，狗狗peace",
-                  "name": "起司凍乾",
-                  "price": "5.99",
-                  "stock": 35
-                }
-              ]
-            }
-          ]
         }
 
     ### 7 更新自己的商店
@@ -413,6 +360,9 @@ API Request / Response 範例
           ]
         }
 
+        403 Forbidden(非商家擁有者)
+
+
   ## Product 商品 API
     ### 8 商家新增商品
       POST /store/products/
@@ -435,45 +385,8 @@ API Request / Response 範例
         }
 
     ### 9 查看商品列表（公開）
-      GET /store/products/
-        Response
-        {
-          "count": 6,
-          "next": "http://127.0.0.1:8000/store/products/?page=2",
-          "previous": null,
-          "results": [
-            {
-              "description": "領帶沒有很愛",
-              "name": "牛肉骰子",
-              "price": "10.99",
-              "stock": 12
-            },
-            {
-              "description": "含有豐富雞肉與鴨肉的狗糧",
-              "name": "羈押狗糧",
-              "price": "7.99",
-              "stock": 0
-            },
-            {
-              "description": "讓帶帶牙齒乾淨溜溜的潔牙骨",
-              "name": "Q彈潔牙骨",
-              "price": "5.99",
-              "stock": 20
-            },
-            {
-              "description": "讓皮膚發亮的狗糧",
-              "name": "鮭魚凍乾糧",
-              "price": "7.99",
-              "stock": 13
-            },
-            {
-              "description": "濃郁奶香Q彈潔牙骨",
-              "name": "牛奶潔牙骨",
-              "price": "6.99",
-              "stock": 23
-            }
-          ]
-        }
+      GET /store/products/ （公開商品列表，支援分頁）
+
 
     ### 10 修改商品（限 owner）
       PATCH /store/products/{id}/
@@ -488,6 +401,11 @@ API Request / Response 範例
           "name": "羈押狗糧",
           "price": "7.99",
           "stock": 20
+        }
+
+        403 Forbidden(非商家修改)
+        {
+          "detail": "You do not have permission to perform this action."
         }
 
   ## Order 訂單處理 API
@@ -564,43 +482,8 @@ API Request / Response 範例
 
     ### 13 修改訂單（會員修改地址、商家修改狀態）
       PATCH /store/orders/{id}/
-        Request Body（會員更新地址）
-        {
-          "address": "台北市大安區忠孝東路三段 200 號"
-        }
-
-        Success Response
-        {
-          "order_number": "ORD20250225-00124",
-          "member": 17,
-          "status": "pending",
-          "payment_method": "unpaid",
-          "receiver_name": "王小明",
-          "receiver_phone": "0912345678",
-          "address": "台北市大安區忠孝東路三段 200 號",
-          "note": "請用紙箱包裝",
-          "created_at": "2025-02-25T10:35:14Z",
-          "items": [
-            {
-              "product_name": "高山烏龍茶禮盒",
-              "product_price": "550.00",
-              "quantity": 2,
-              "item_subtotal": "1100.00"
-            },
-            {
-              "product_name": "100% 純蜂蜜",
-              "product_price": "300.00",
-              "quantity": 1,
-              "item_subtotal": "300.00"
-            }
-          ],
-          "total_amount": "1400.00"
-        }
-
-        Request Body（商家更新狀態 → paid）
-        {
-          "status": "paid"
-        }
+        Member：更新收件資訊
+        Merchant：更新訂單狀態（paid / shipped）
 
         Success Response
         {
@@ -609,92 +492,164 @@ API Request / Response 範例
           "total_amount": "1400.00"
         }
 
-  ## 狀態變更 action
+  ## 狀態變更 Actions（Business Workflow）
     ### 14 付款
       POST /store/orders/{id}/pay/
-        {
-          "detail": "付款成功",
-          "status": "paid"
-        }
-
     ### 15 出貨
       POST /store/orders/{id}/ship/
-        {
-          "detail": "出貨狀態已更新",
-          "status": "shipped"
-        }
-
     ### 16取消訂單
       POST /store/orders/{id}/cancel/
-        {
-          "detail": "訂單已取消",
-          "status": "canceled"
-        }
 
+---
 
+Database Strategy（This project follows the 12-Factor App methodology by separating configuration from code.）
+  本專案在不同環境使用不同資料庫，以兼顧開發效率與正式環境穩定性，採用 環境變數切換資料庫策略。
 
-測試 Test（即將完成）
+  為什麼本機使用 SQLite？
+    在本機開發與測試階段，本專案使用 SQLite：
+    1. 不需額外安裝資料庫服務
+    2. 設定簡單、啟動快速
+    3. 適合 migrations、單元測試（pytest）
+    這讓開發者可以專注在 商業邏輯與 API 設計，而非環境設定。
 
+  為什麼部署環境改用 PostgreSQL？
+    在正式部署（Render）環境，本專案改用 PostgreSQL：
+      1. Render 容器為短生命週期（ephemeral）
+      2. SQLite 為檔案型資料庫，重啟後資料可能遺失
+      3. PostgreSQL 為獨立資料庫服務，資料可持久保存
+    因此正式環境必須使用 PostgreSQL 以確保資料安全與一致性。
 
-專案 Roadmap（準備進行）
+  技術實作方式
+    本專案使用 dj-database-url 來根據 環境變數自動切換資料庫，不需修改任何程式碼邏輯。
 
-  A. Media / 圖片上傳（商品圖片、會員頭像）
-  B. Swagger / drf-spectacular
+  Render 環境設定
+    在 Render Web Service 中設定以下 Environment Variables：
+    | Name                     | Value                          |
+    | ------------------------ | ------------------------------ |
+    | `DATABASE_URL`           | Render 提供的 PostgreSQL 連線字串     |
+    | `DJANGO_SETTINGS_MODULE` | `Merchant_X_Consumer.settings` |
+    | `SECRET_KEY`             | Django secret key              |
+    | `DEBUG`                  | `False`                        |
 
+  部署時 Render 會自動：
+    1. 安裝 PostgreSQL driver（psycopg2-binary）
+    2. 連線至 PostgreSQL
+    3. 執行 python manage.py migrate
+    4. 啟動 Django API
+
+  成功驗證方式
+    正式部署後，透過以下方式確認 PostgreSQL 已成功啟用：
+      1. Render 服務重啟後，已建立的使用者 / 商家帳號仍可正常登入
+      2. 資料在服務重啟後仍存在，確認使用的是持久化資料庫
+
+---
+
+Testing Strategy
+  本專案已建立 完整的自動化測試流程，確保核心商業邏輯與權限控制的正確性。
+
+  測試工具
+    1. pytest
+    2. pytest-django
+    3. factory_boy
+    4. Django Test Client / DRF APIClient
+
+  測試設計原則
+    1. 每個角色行為皆有測試（Member / Merchant / Admin）
+    2. 權限為第一優先測試項目
+    3. 測試專注在「業務邏輯是否正確」，而非實作細節
+
+  測試內容涵蓋
+    Member
+      1. 會員註冊 / 登入
+      2. 只能查看與修改自己的會員資料
+      3. 無法存取其他會員資料
+
+    Store / Product（Merchant）
+      1. 商家只能建立一間商店
+      2. 商家只能修改 / 刪除自己的商店與商品
+      3. 無法操作其他商家的資源
+
+    Order
+      1. 會員可建立訂單
+      2. 訂單建立時會檢查商品庫存
+      3. 商家只能看到「包含自己商品」的訂單
+      4. 訂單狀態變更遵守狀態轉移規則（Pending → Paid → Shipped → Completed）
+
+  測試結構
+    tests/
+    ├── conftest.py          # 共用 fixtures（API client, user）
+    ├── factories/           # factory_boy 建立測試資料
+    │   ├── user_factory.py
+    │   ├── merchant_factory.py
+    │   └── store_factory.py
+    ├── members/
+    │   ├── test_member_login.py
+    │   └── test_member_profile.py
+    ├── stores/
+    │   ├── test_store_crud.py
+    │   └── test_product_crud.py
+    └── orders/
+        ├── test_order_create.py
+        ├── test_order_update.py
+        └── test_order_permissions.py
+
+---
+
+CI（Continuous Integration）
+  本專案已整合 GitHub Actions：
+    1. 每次 push / pull request 自動執行測試
+    2. 驗證 migration + pytest 是否通過
+    3. 作為品質保證（Quality Gate）
+  確保任何變更都不會破壞既有功能。
+
+  為什麼這樣設計？
+    1. 本機、CI、正式環境設定一致
+    2. DB 設定與程式碼分離（符合 12-factor app）
+    3. 測試可快速驗證商業規則與權限安全性
+    4. 部署流程可重現、可擴充
+
+---
 
 Docker 開發流程（Development with Docker）
-
   本專案使用 Docker + Docker Compose 作為主要開發與測試環境，確保：
-    A. 本機環境一致
-    B. CI / CD 與本地行為相同
-    C. 降低「我本機可以、你那邊不行」的風險
+    1. 本機環境一致
+    2. CI / CD 與本地行為相同
+    3. 降低「我本機可以、你那邊不行」的風險
 
   環境需求
-
-    A. Docker Desktop
-    B. Docker Compose（v2）
+    1. Docker Desktop
+    2. Docker Compose（v2）
 
   啟動專案（第一次或 Docker 設定有變更）
-
     docker compose up --build
 
     或背景執行：
     docker compose up -d --build
 
   資料庫遷移（在容器內）
-
     docker compose exec web python manage.py migrate
 
-  執行測試（推薦方式）
-
+  執行測試
     docker compose exec web pytest
     ⚠️ 請勿直接在本機執行 pytest
     Django 專案實際執行環境為 Docker container
 
   停止服務
-
     docker compose down
 
-  Docker + CI（GitHub Actions）
-
-    本專案已設定 GitHub Actions：
-      A. 每次 push / pull request 自動執行測試
-      B. 驗證 migration + pytest 是否通過
-      C. 作為品質保證（Quality Gate）
-
+---
 
 Technical Highlights（技術亮點）
   1. Multi-Role Architecture（多角色架構設計）
-
     本專案採用 單一 User + 角色分離（Role-based Design） 架構：
       A. User：認證、JWT、身份來源
       B. Member：一般消費者（下單、會員資料）
       C. Merchant：商家（商店、商品、訂單處理）
       D. Admin：系統管理（Django Admin）
 
-      User
-      ├── Member (OneToOne)
-      └── Merchant (OneToOne)
+        User
+        ├── Member (OneToOne)
+        └── Merchant (OneToOne)
 
     優點
       A. 避免 User model 過度膨脹
@@ -702,7 +657,6 @@ Technical Highlights（技術亮點）
       C. 權限與商業邏輯清楚分離
 
   2. Object-Level Permission Control（物件層級權限控管）
-
     不僅檢查是否登入，還嚴格驗證「是否為資源擁有者」：
       A. 商家只能修改 自己的商店
       B. 會員只能查看 自己的訂單
@@ -711,7 +665,6 @@ Technical Highlights（技術亮點）
     所有權限邏輯集中於 permissions.py，避免散落在 View 中，提高可維護性與可測試性。
 
   3. Order State Machine（訂單狀態機）
-
     訂單狀態並非任意修改，而是遵循明確狀態轉換規則：
       pending → paid → shipped → completed
         └──→ canceled
@@ -722,14 +675,12 @@ Technical Highlights（技術亮點）
       C. 狀態錯誤可即時阻擋
 
   4. Price Snapshot（購買當下價格鎖定）
-
     OrderItem 儲存 price_at_purchase，而非直接使用商品即時價格，確保：
       A. 商品價格變動不影響歷史訂單
       B. 訂單金額具備可追溯性
       C. 符合實際電商系統設計
 
   5. Concurrency-Safe Inventory Handling（高併發庫存安全）
-
     建立訂單時使用：
       A. transaction.atomic()
       B. select_for_update()
@@ -737,7 +688,6 @@ Technical Highlights（技術亮點）
     避免多人同時下單造成庫存超賣，確保資料一致性。
 
   6. Clear Serializer Responsibility（序列化職責分離）
-
     針對不同 API 行為，使用不同 Serializer：
       A. OrderCreateSerializer：建立訂單
       B. OrderUpdateSerializer：更新狀態 / 收件資料
@@ -746,7 +696,6 @@ Technical Highlights（技術亮點）
     避免萬用 Serializer，讓每個 API 行為語意清楚。
 
   7. Automated Testing with pytest + factory_boy
-
     (1)使用 pytest + factory_boy
     (2)測試涵蓋：
       A. 權限邏輯
@@ -756,16 +705,20 @@ Technical Highlights（技術亮點）
     測試資料與實際資料完全隔離，確保專案具備長期維護能力。
 
   8. CI with GitHub Actions & Docker
-
     (1)Docker Compose 本地開發環境
     (2)GitHub Actions 自動執行：
       A. migration
       B. pytest
-
     (3)每次 push / PR 都會驗證專案穩定性
 
   總結
   本專案不只是 CRUD，而是完整模擬實際電商系統的 角色、權限、狀態、併發、測試與交付流程。
+
+---
+
+專案 Roadmap（準備進行）
+  1. Media / 圖片上傳（商品圖片、會員頭像）
+  2. Swagger / drf-spectacular
 
 
  License
