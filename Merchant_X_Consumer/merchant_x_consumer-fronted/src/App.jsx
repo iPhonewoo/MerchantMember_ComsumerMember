@@ -1,94 +1,78 @@
-// import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-// import './App.css'
-
-// function App() {
-//   const [count, setCount] = useState(0)
-
-//   return (
-//     <>
-//       <div>
-//         <a href="https://vite.dev" target="_blank">
-//           <img src={viteLogo} className="logo" alt="Vite logo" />
-//         </a>
-//         <a href="https://react.dev" target="_blank">
-//           <img src={reactLogo} className="logo react" alt="React logo" />
-//         </a>
-//       </div>
-//       <h1>Vite + React</h1>
-//       <div className="card">
-//         <button onClick={() => setCount((count) => count + 1)}>
-//           count is {count}
-//         </button>
-//         <p>
-//           Edit <code>src/App.jsx</code> and save to test HMR
-//         </p>
-//       </div>
-//       <p className="read-the-docs">
-//         Click on the Vite and React logos to learn more
-//       </p>
-//     </>
-//   )
-// }
-
-// export default App
-
-import { useState } from "react";
+import { Routes, Route, Navigate, Link, useNavigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import ProductPage from "./pages/ProductPage";
-import OrderPage from "./pages/OrderPage";
-import OrderListPage from "./pages/OrderListPage";
-import OrderDetailPage from "./pages/OrderDetailPage";
+import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import CreateProductPage from "./pages/CreateProductPage";
+import Navbar from "./components/Navbar";
+
+function ProtectedRoute({ children }) {
+  const loggedIn = !!localStorage.getItem("access");
+  if (!loggedIn) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
+
+function AuthLayout({ children }) {
+  return (
+    <>
+      <Navbar />
+      {children}
+    </>
+  );
+}
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(
-    !!localStorage.getItem("access")
-  );
-  const [productId, setProductId] = useState(null);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [page, setPage] = useState("products");
+  const navigate = useNavigate();
 
-  if (!loggedIn) {
-    return <LoginPage onLogin={() => setLoggedIn(true)} />;
-  }
-
-  if (selectedOrder) {
-    return (
-      <OrderDetailPage
-        orderNumber={selectedOrder}
-        onBack={() => setSelectedOrder(null)}
-      />
-    );
-  }
-
-  if (productId) {
-    return (
-      <OrderPage
-        productId={productId}
-        onDone={() => {
-          setProductId(null);
-          setPage("orders");
-        }}
-      />
-    );
-  }
-
-  if (page === "orders") {
-    return (
-      <OrderListPage
-        onSelect={(orderNumber) => setSelectedOrder(orderNumber)}
-      />
-    );
-  }
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login", { replace: true });
+  };
 
   return (
-    <div>
-      <button onClick={() => setPage("products")}>商品</button>
-      <button onClick={() => setPage("orders")}>我的訂單</button>
+      <Routes>
+        {/* 登入頁 */}
+        <Route path="/login" element={<LoginPage />} />
 
-      <ProductPage onOrder={(id) => setProductId(id)} />
-    </div>
+        {/* 需要登入的頁面 */}
+        <Route path="/" element={
+                        <AuthLayout>
+                          <ProtectedRoute>
+                            <ProductPage />
+                          </ProtectedRoute>
+                        </AuthLayout>
+                        } 
+                        />
+        <Route path="/cart" element={
+                         <AuthLayout>
+                          <ProtectedRoute>
+                            <CartPage />
+                          </ProtectedRoute>
+                        </AuthLayout>
+                        } 
+                        />
+        <Route path="/checkout" element={
+                        <AuthLayout>  
+                          <ProtectedRoute>
+                            <CheckoutPage />
+                          </ProtectedRoute>
+                        </AuthLayout>
+                        } 
+                        />
+        <Route path="/create-product" element={
+                        <AuthLayout>  
+                          <ProtectedRoute>
+                            <CreateProductPage />
+                          </ProtectedRoute>
+                        </AuthLayout>
+                        } 
+                        />
+        
+        {/* 其他路徑一律導回首頁 */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
   );
 }
 

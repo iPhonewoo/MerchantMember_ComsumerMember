@@ -10,7 +10,7 @@ class ProductSerializer(serializers.ModelSerializer):
     store_name = serializers.CharField(source='store.name', read_only=True) # 取得關聯的Store名稱
     class Meta:
         model = Product
-        fields = ['description', 'name', 'price', 'stock', 'store_name']
+        fields = ['id', 'description', 'name', 'price', 'stock', 'store_name']
 
     def validate_price(self, value): 
         if value < 0:
@@ -48,15 +48,18 @@ class OrderItemSerializer(serializers.ModelSerializer):
             'item_subtotal'
         ] # 訂單項目小計
 
-
-class OrderCreateSerializer(serializers.ModelSerializer):
-    class OrderItemCreateSerializer(serializers.ModelSerializer):
+class OrderItemCreateSerializer(serializers.ModelSerializer):
+        product = serializers.PrimaryKeyRelatedField(
+            queryset=Product.objects.all()
+        )
         class Meta:
             model = OrderItem
             fields = [
                 'product', 
                 'quantity', 
             ]
+
+class OrderCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [
@@ -79,17 +82,20 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             'payment_method',
         ]
     order_number = serializers.CharField(read_only=True)
-    items = OrderItemCreateSerializer(many=True, required=True) # 嵌套的OrderItem序列化器，用於建立訂單時使用
+    items = OrderItemCreateSerializer(
+        many=True, 
+        write_only=True,
+    )
          
     def create(self, validated_data):
         orderitem_data = validated_data.pop('items',[]) # 從validated_data中取出子資料(validated_data是DRF中已驗證過的dict資料)
-        member = validated_data.pop('member')
+        # member = validated_data.pop('member')
 
         if not orderitem_data:
             raise ValidationError("訂單至少要有一項商品喔！")
 
         with transaction.atomic():
-            order = Order.objects.create(member=member, **validated_data) # 建立主資料訂單(子資料已經被取出，故可以create)
+            order = Order.objects.create(**validated_data) # 建立主資料訂單(子資料已經被取出，故可以create)
 
             total_amount = Decimal(0)
 

@@ -106,8 +106,21 @@ class OrderListCreateAPIView(generics.ListCreateAPIView):
             return OrderCreateSerializer
         return OrderSerializer
     
-    def perform_create(self, serializer):
-        serializer.save(member=self.request.user.member)
+    # def perform_create(self, serializer):
+        # serializer.save(member=self.request.user.member)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if not serializer.is_valid():
+            # 🔥 關鍵：把真正的錯誤印出來
+            print("SERIALIZER ERRORS =", serializer.errors)
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer.save(member=request.user.member)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get_queryset(self):
         user =self.request.user

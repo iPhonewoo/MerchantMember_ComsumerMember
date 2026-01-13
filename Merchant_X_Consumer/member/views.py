@@ -18,6 +18,8 @@ from rest_framework.permissions import IsAuthenticated  # 確保只有已驗證�
 from rest_framework_simplejwt.views import TokenObtainPairView # 用於JWT驗證
 from member.permissions import IsMember, IsOwnerOfMemberProfile, IsAdmin
 from rest_framework.exceptions import PermissionDenied
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 # Create your views here.
 
 class RegisterView(generics.CreateAPIView):
@@ -25,9 +27,13 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]  # 允許任何人存取註冊API
 
-
+@method_decorator(csrf_exempt, name="dispatch")
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        print("🔥 LOGIN POST HIT 🔥")
+        return super().post(request, *args, **kwargs)
 
 
 class MemberViewSet(
