@@ -712,8 +712,27 @@ Technical Highlights（技術亮點）
 
 ---
 
-Order System前端介接
-See `docs/order-backend-notes.md` for backend design and debugging notes.
+Frontend Integration (API Consumer Validation)
+
+  本專案包含一個最小化的前端應用，用於實際驗證後端 API 的可用性與設計合理性。
+
+  前端定位說明：
+    1. 前端僅作為 API Consumer 與流程驗證工具
+    2. 不作為本專案的核心設計重點
+    3. 所有商業邏輯、權限判斷與狀態控制皆由後端負責
+
+  已驗證的前端流程包含：
+    1. 使用者註冊 / 登入（JWT）
+    2. Role-based 行為驗證（Member / Merchant）
+    3. 商家商品上架
+    4. 會員下單流程（Cart → Order → OrderItem）
+    5. 訂單列表呈現（僅能查看自身訂單）
+    6. DRF Pagination 實際前端消費（results / count）
+
+    若要詳細了解Order介接流程及實際除錯經驗，請參考`docs/order-backend-notes.md`
+
+  此前端實作主要用於驗證後端 API 在真實使用情境下的正確性與穩定性，
+  並非本專案的核心設計重點。
 
 ---
 
