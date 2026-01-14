@@ -86,11 +86,7 @@ Merchant_X_Consumer/
   User (Django auth user)
   │
   ├── Member (OneToOne)
-  │     - member_name
-  │     - member_email
-  │     - login_days
-  │     - member_points
-  │
+  │     
   └── Merchant (OneToOne)
         │
         └── Store (OneToOne)
@@ -716,11 +712,17 @@ Technical Highlights（技術亮點）
 
 ---
 
+Order System前端介接
+See `docs/order-backend-notes.md` for backend design and debugging notes.
+
+---
+
 專案 Roadmap（準備進行）
   1. Media / 圖片上傳（商品圖片、會員頭像）
   2. Swagger / drf-spectacular
 
+---
 
- License
+License
  MIT License
 
