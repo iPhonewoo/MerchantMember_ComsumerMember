@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, Link, useNavigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
@@ -35,6 +36,7 @@ function App() {
       <Routes>
         {/* 登入頁 */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
         {/* 需要登入的頁面 */}
         <Route path="/" element={
