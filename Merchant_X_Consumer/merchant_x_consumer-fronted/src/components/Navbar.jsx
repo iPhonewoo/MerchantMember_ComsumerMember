@@ -14,6 +14,7 @@ export default function Navbar() {
       <Link to="/cart">購物車</Link>
       <Link to="/checkout">結帳</Link>
       <Link to="/create-product">上架商品</Link>
+      <Link to="/orders">我的訂單</Link>
       <button onClick={handleLogout}>登出</button>
     </div>
   );

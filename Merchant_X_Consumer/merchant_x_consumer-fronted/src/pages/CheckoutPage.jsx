@@ -1,6 +1,7 @@
 import { useState } from "react";
 import client from "../api/client";
 import { useCart } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
 
 const CheckoutPage = () => {
   const { cart, clearCart } = useCart();
@@ -9,6 +10,8 @@ const CheckoutPage = () => {
   const [receiverPhone, setReceiverPhone] = useState("");
   const [address, setAddress] = useState("");
   const [note, setNote] = useState("");
+
+  const navigate = useNavigate();
 
   const submitOrder = async () => {
     if (cart.length === 0) {
@@ -27,6 +30,7 @@ const CheckoutPage = () => {
       })),
     };
 
+
     console.log("CART RAW =", cart);
 
     cart.forEach((item, idx) => {
@@ -39,6 +43,7 @@ const CheckoutPage = () => {
       await client.post("/store/orders/", payload);
       alert("下單成功！");
       clearCart();
+      navigate("/orders", { replace: true }); // 導向訂單列表頁
     } catch (err) {
       alert("下單失敗");
       console.error(err.response?.data);

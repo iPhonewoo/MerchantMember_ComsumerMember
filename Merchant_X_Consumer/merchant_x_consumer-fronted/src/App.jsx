@@ -4,6 +4,7 @@ import RegisterPage from "./pages/RegisterPage";
 import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
+import OrderListPage from "./pages/OrderListPage";
 import CreateProductPage from "./pages/CreateProductPage";
 import Navbar from "./components/Navbar";
 
@@ -63,6 +64,12 @@ function App() {
                         </AuthLayout>
                         } 
                         />
+        <Route path="/orders" element={
+                        <AuthLayout>
+                          <ProtectedRoute>
+                            <OrderListPage />
+                          </ProtectedRoute>
+                        </AuthLayout>} />
         <Route path="/create-product" element={
                         <AuthLayout>  
                           <ProtectedRoute>
