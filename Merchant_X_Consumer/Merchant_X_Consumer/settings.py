@@ -160,7 +160,7 @@ SPECTACULAR_SETTINGS = {
 }
 
 CORS_ALLOWED_ORIGINS =[
-    "https://merchantmember-comsumermember.onrender.com/",
+    "https://merchantmember-comsumermember.onrender.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
