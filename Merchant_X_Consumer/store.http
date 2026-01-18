@@ -65,6 +65,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
 }
 
 ###
+GET http://127.0.0.1:8000/store/orders/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NzM3Mzg5LCJpYXQiOjE3Njg3MzcwODksImp0aSI6IjJiYTUyYmI2OWFmNTQ5ZGY5MTQ2MmRlNGNjZWExZTNkIiwidXNlcl9pZCI6IjMiLCJyb2xlIjoibWVtYmVyIn0.3dOb6MTgXvqlMF8AWQmvfeqpwGfhGpbmLEzoHPsUaok
+
+###
 POST http://127.0.0.1:8000/store/orders/ HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY3NjAxMzAwLCJpYXQiOjE3Njc2MDEwMDAsImp0aSI6ImRjYWExZjVhOGJmZDQ3ZDZiOTFhNjExYjU5YjRiMTdiIiwidXNlcl9pZCI6IjMiLCJyb2xlIjoibWVtYmVyIn0.yT-6OUXyL2VfUxWLYTR2_f34e_vdGQ_D0EqHqJMuEWw
@@ -87,14 +92,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
 }
 
 ###
-GET http://127.0.0.1:8000/store/orders/1/ HTTP/1.1
+GET http://127.0.0.1:8000/store/orders/2/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY3NjAxMTQ4LCJpYXQiOjE3Njc2MDA4NDgsImp0aSI6IjA3NmI3YmJlOTUxMzQ4MTA4MDg3MTdhMzVjNTU2Zjc4IiwidXNlcl9pZCI6IjMiLCJyb2xlIjoibWVtYmVyIn0.Wz5_q10PKzsOpFRcKPP22fhprD5RYO-HudGDrP0fCWc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NzQwMTk2LCJpYXQiOjE3Njg3Mzk4OTYsImp0aSI6IjU3MzllMDJiMTliODRjNmQ5OWEzNDdmNWM1YTU0M2YwIiwidXNlcl9pZCI6IjMiLCJyb2xlIjoibWVtYmVyIn0.HCK_Yaqqqm__dpV_RyEUzwlPxfI5_KD1F0hX8jY2LR0
 
 ###
 PATCH  http://127.0.0.1:8000/store/orders/1/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY3NjAxMTQ4LCJpYXQiOjE3Njc2MDA4NDgsImp0aSI6IjA3NmI3YmJlOTUxMzQ4MTA4MDg3MTdhMzVjNTU2Zjc4IiwidXNlcl9pZCI6IjMiLCJyb2xlIjoibWVtYmVyIn0.Wz5_q10PKzsOpFRcKPP22fhprD5RYO-HudGDrP0fCWc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NzQwMTk2LCJpYXQiOjE3Njg3Mzk4OTYsImp0aSI6IjU3MzllMDJiMTliODRjNmQ5OWEzNDdmNWM1YTU0M2YwIiwidXNlcl9pZCI6IjMiLCJyb2xlIjoibWVtYmVyIn0.HCK_Yaqqqm__dpV_RyEUzwlPxfI5_KD1F0hX8jY2LR0
 
 {
     "address": "高雄市高雄區高雄路200號"
