@@ -38,7 +38,7 @@ client.interceptors.response.use(
         const refresh = localStorage.getItem("refresh");
 
         const res = await axios.post(
-          "http://127.0.0.1:8000/member/token/refresh/",
+          "/member/token/refresh/",
           { refresh }
         );
 
