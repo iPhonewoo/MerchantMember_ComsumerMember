@@ -2,7 +2,7 @@ POST  http://127.0.0.1:8000/member/login/ HTTP/1.1
 Content-Type: application/json
 
 {
-    "username": "fun",
+    "username": "tie",
     "password": "123"
 }
 
@@ -124,3 +124,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
     "phone_num": "0987654321"
 
 }
+
+###
+
+GET http://127.0.0.1:8000/store/orders/analytics/summary/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY5MTc3MzAwLCJpYXQiOjE3NjkxNzcwMDAsImp0aSI6IjkxMTEwNGUwNTQ3OTQ4ZGJiZDJjMzAxY2Q0MzgxNjc3IiwidXNlcl9pZCI6IjEiLCJyb2xlIjoibWVyY2hhbnQifQ.Qu3EGtXhAEDNJyCWyTCNG6iM7oSDtAJ4KMv9yY41m-8

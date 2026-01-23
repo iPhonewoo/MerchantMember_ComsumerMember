@@ -11,6 +11,7 @@ urlpatterns = [
     path("orders/<int:pk>/pay/", store_views.OrderPayAPIView.as_view(), name="order_pay"),
     path("orders/<int:pk>/ship/", store_views.OrderShipAPIView.as_view(), name="order_ship"),
     path("orders/<int:pk>/cancel/", store_views.OrderCancelAPIView.as_view(), name="order_cancel"),
+    path("orders/analytics/summary/", store_views.OrderAnalyticsSummaryAPIView.as_view(), name="order_analytics_summary"),
 
 ]
 

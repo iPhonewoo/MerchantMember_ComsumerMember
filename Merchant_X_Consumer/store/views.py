@@ -21,8 +21,11 @@ from rest_framework.views import APIView  # 基本的API視圖類別
 from store.filter import (InStockFilterBackend, OrderFilter,  # 自定義的過濾器
                           ProductFilter)
 from store.models import Store, Order, OrderItem, Product
+from member.models import Merchant
 from store.serializers import (StoreSerializer, OrderSerializer, ProductInfoSerializer,
-                               ProductSerializer, OrderCreateSerializer, OrderUpdateSerializer)
+                               ProductSerializer, OrderCreateSerializer, OrderUpdateSerializer,
+                               OrderSummarySerializer)
+from store.services.order_analytics import build_order_summary
 from member.permissions import (IsMerchant, 
                                 IsMember, 
                                 IsOwnerOfStore, 
@@ -33,6 +36,11 @@ from rest_framework.exceptions import ValidationError, PermissionDenied # 用於
 from datetime import datetime
 
 # Create your views here.
+def parse_date(value):
+    if not value:
+        return None
+    return datetime.strptime(value, "%Y-%m-%d").date()
+
 class StoreViewSet(viewsets.ModelViewSet):
     queryset = Store.objects.all()
     serializer_class = StoreSerializer
@@ -274,5 +282,25 @@ class ProductInfoAPIView(APIView):
             'max_price': products.aggregate(max_price=Max('price'))['max_price'] # 取得最高價格
         })
         return Response(serializer.data)
+    
+class OrderAnalyticsSummaryAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsMerchant]
 
+    def get(self, request):
+        try:
+            merchant = Merchant.objects.get(user=request.user)
+        except Merchant.DoesNotExist:
+            raise PermissionDenied("您不是此商品訂單的商家，無法查看這些訂單的分析資料！")
+
+        start = parse_date(request.query_params.get("start"))
+        end = parse_date(request.query_params.get("end"))
+
+        summary = build_order_summary(
+            merchant=merchant,
+            start=start,
+            end=end,
+        )
+
+        serializer = OrderSummarySerializer(summary)
+        return Response(serializer.data)
 

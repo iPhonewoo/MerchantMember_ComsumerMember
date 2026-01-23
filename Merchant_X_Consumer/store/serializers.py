@@ -186,3 +186,14 @@ class ProductInfoSerializer(serializers.Serializer):
     products = ProductSerializer(many=True) # 產品列表
     count = serializers.IntegerField() # 總數量
     max_price = serializers.FloatField() # 最高價格
+
+class OrderStatusBreakdownSerializer(serializers.Serializer):
+    sratus = serializers.CharField()
+    count = serializers.IntegerField()
+
+class OrderSummarySerializer(serializers.Serializer):
+    start = serializers.DateField(allow_null=True)
+    end = serializers.DateField(allow_null=True)
+    order_count = serializers.IntegerField()
+    gmv = serializers.DecimalField(max_digits=12, decimal_places=2)
+    aov = serializers.DecimalField(max_digits=12, decimal_places=2)
