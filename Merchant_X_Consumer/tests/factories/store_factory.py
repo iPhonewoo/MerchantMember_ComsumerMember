@@ -6,8 +6,6 @@ from .user_factory import MerchantFactory
 class StoreFactory(factory.django.DjangoModelFactory):
     """
     Store 工廠，用來建立商店。
-
-    重點：
     - merchant 欄位使用 MerchantFactory，自動建立「商家 + user」
     - name / address / description 都給合理的預設值
     """
