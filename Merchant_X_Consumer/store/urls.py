@@ -11,11 +11,11 @@ urlpatterns = [
     path("orders/<int:pk>/pay/", store_views.OrderPayAPIView.as_view(), name="order_pay"),
     path("orders/<int:pk>/ship/", store_views.OrderShipAPIView.as_view(), name="order_ship"),
     path("orders/<int:pk>/cancel/", store_views.OrderCancelAPIView.as_view(), name="order_cancel"),
-    path("orders/analytics/summary/", store_views.OrderAnalyticsSummaryAPIView.as_view(), name="order_analytics_summary"),
 
 ]
 
 router = DefaultRouter()
 router.register('stores', store_views.StoreViewSet, basename='store') # 註冊Store的ViewSet到路由系統
 router.register('products', store_views.ProductViewSet, basename='product') # 註冊Product的ViewSet到路由系統
+router.register('merchant/analytics', store_views.MerchantAnalyticsViewSet, basename='merchant_analytics')
 urlpatterns += router.urls
