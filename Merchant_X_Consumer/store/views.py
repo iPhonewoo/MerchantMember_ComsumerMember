@@ -24,8 +24,10 @@ from store.models import Store, Order, OrderItem, Product
 from member.models import Merchant
 from store.serializers import (StoreSerializer, OrderSerializer, ProductInfoSerializer,
                                ProductSerializer, OrderCreateSerializer, OrderUpdateSerializer,
-                               OrderSummarySerializer)
-from store.services.order_analytics import build_order_summary
+                               OrderSummarySerializer, OrderTimeseriesSerializer, TopProductsResponseSerializer,
+                               TopCustomersResponseSerializer)
+from store.analytics.services.order_analytics import (
+    build_order_summary, build_order_timeseries, build_top_products, build_top_customers)
 from member.permissions import (IsMerchant, 
                                 IsMember, 
                                 IsOwnerOfStore, 
@@ -282,25 +284,110 @@ class ProductInfoAPIView(APIView):
             'max_price': products.aggregate(max_price=Max('price'))['max_price'] # 取得最高價格
         })
         return Response(serializer.data)
-    
-class OrderAnalyticsSummaryAPIView(APIView):
+
+
+class MerchantAnalyticsViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated, IsMerchant]
 
-    def get(self, request):
-        try:
-            merchant = Merchant.objects.get(user=request.user)
-        except Merchant.DoesNotExist:
-            raise PermissionDenied("您不是此商品訂單的商家，無法查看這些訂單的分析資料！")
-
+    def get_merchant(self, request):
+        return Merchant.objects.get(user=request.user)
+    
+    def get_date_range(self, request):
         start = parse_date(request.query_params.get("start"))
         end = parse_date(request.query_params.get("end"))
 
-        summary = build_order_summary(
+        if not start or not end:
+            raise ValidationError("請提供有效的 start 和 end 日期參數，格式為 YYYY-MM-DD")
+        return start, end
+    
+    def get_statuses(self, request):
+        statuses = request.query_params.getlist("status")
+        if not statuses:
+            statuses = [
+                Order.StatusChoices.PAID,
+                Order.StatusChoices.COMPLETED,
+            ]
+        return statuses
+    
+    def get_limit(self, request, default=5):
+        try:
+            return int(request.query_params.get("limit", default))
+        except ValueError:
+            raise ValidationError("limit 必須是整數")
+    
+    @action(detail=False, methods=["get"])
+    def order_summary(self, request):
+        merchant = self.get_merchant(request)
+        start, end = self.get_date_range(request)
+        data = build_order_summary(
             merchant=merchant,
             start=start,
             end=end,
         )
 
-        serializer = OrderSummarySerializer(summary)
-        return Response(serializer.data)
+        return Response(OrderSummarySerializer(data).data)
+    
+    @action(detail=False, methods=["get"])
+    def timeseries(self, request):
+        merchant = self.get_merchant(request)
+        start, end = self.get_date_range(request)
+        statuses = self.get_statuses(request)
 
+        group_by = request.query_params.get("group_by", "day")
+        if group_by not in {"day", "month"}:
+            raise ValidationError("group_by 只能是 day 或 month")
+
+        data = build_order_timeseries(
+            merchant=merchant,
+            start=start,
+            end=end,
+            group_by=group_by,
+            statuses=statuses
+        )
+
+        return Response(OrderTimeseriesSerializer({
+            "group_by": group_by,
+            "start": start,
+            "end": end,
+            "series": data,
+        }).data)
+
+    @action(detail=False, methods=["get"])
+    def top_products(self, request):
+        merchant = self.get_merchant(request)
+        start, end = self.get_date_range(request)
+        limit = self.get_limit(request, 10)
+
+        data = build_top_products(
+            merchant=merchant,
+            start=start,
+            end=end,
+            limit=limit
+        )
+
+        return Response(TopProductsResponseSerializer({
+            "start": start,
+            "end": end,
+            "limit": limit,
+            "top_products": data,
+        }).data)
+
+    @action(detail=False, methods=["get"])
+    def top_customers(self, request):
+        merchant = self.get_merchant(request)
+        start, end = self.get_date_range(request)
+        limit = self.get_limit(request)
+
+        data = build_top_customers(
+            merchant=merchant,
+            start=start,
+            end=end,
+            limit=limit
+        )
+
+        return Response(TopCustomersResponseSerializer({
+            "start": start,
+            "end": end,
+            "limit": limit,
+            "top_customers": data,
+        }).data)
