@@ -187,6 +187,7 @@ class ProductInfoSerializer(serializers.Serializer):
     count = serializers.IntegerField() # 總數量
     max_price = serializers.FloatField() # 最高價格
 
+# Analytics Serializers
 class OrderStatusBreakdownSerializer(serializers.Serializer):
     sratus = serializers.CharField()
     count = serializers.IntegerField()
@@ -197,3 +198,43 @@ class OrderSummarySerializer(serializers.Serializer):
     order_count = serializers.IntegerField()
     gmv = serializers.DecimalField(max_digits=12, decimal_places=2)
     aov = serializers.DecimalField(max_digits=12, decimal_places=2)
+
+
+class OrderTimeseriesPointSerializer(serializers.Serializer):
+    date = serializers.DateField()
+    order_count = serializers.IntegerField()
+    gmv = serializers.DecimalField(max_digits=12, decimal_places=2)
+
+class OrderTimeseriesSerializer(serializers.Serializer):
+    group_by = serializers.CharField()
+    start = serializers.DateField()
+    end = serializers.DateField()
+    series = OrderTimeseriesPointSerializer(many=True)
+
+
+class TopProductSerializer(serializers.Serializer):
+    product_id = serializers.IntegerField()
+    product_name = serializers.CharField(source="product__name")
+    order_count = serializers.IntegerField()
+    quantity = serializers.IntegerField()
+    revenue = serializers.DecimalField(max_digits=12, decimal_places=2)
+
+class TopProductsResponseSerializer(serializers.Serializer):
+    start = serializers.DateField()
+    end = serializers.DateField()
+    limit = serializers.IntegerField()
+    top_products = TopProductSerializer(many=True)
+
+
+class TopCustomerSerializer(serializers.Serializer):
+    member_id = serializers.IntegerField(source="order__member_id")
+    member_username = serializers.CharField(source="order__member__user__username")
+    total_gmv = serializers.DecimalField(max_digits=12, decimal_places=2)
+    order_count = serializers.IntegerField()
+    last_order_date = serializers.DateField()
+
+class TopCustomersResponseSerializer(serializers.Serializer):
+    start = serializers.DateField()
+    end = serializers.DateField()
+    limit = serializers.IntegerField()
+    top_customers = TopCustomerSerializer(many=True)
