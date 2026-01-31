@@ -66,5 +66,5 @@ jobs:
 
       - name: Run analytics tests only
         run: |
-          pytest ../store/analytics/services/tests -v
+          pytest store/analytics/services/tests -v
 
