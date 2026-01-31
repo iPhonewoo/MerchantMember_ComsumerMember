@@ -29,12 +29,12 @@ def test_order_summary_basic_metrics():
     order1 = OrderFactory(
         member=member,
         status=Order.StatusChoices.PAID,
-        created_at=datetime(2026, 1, 10),
+        set_created_at=datetime(2026, 1, 10),
     )
     order2 = OrderFactory(
         member=member,
         status=Order.StatusChoices.COMPLETED,
-        created_at=datetime(2026, 1, 15),
+        set_created_at=datetime(2026, 1, 15),
     )
 
     OrderItemFactory(order=order1, product=product_a, quantity=2)  # 200
