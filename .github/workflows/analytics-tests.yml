@@ -15,6 +15,10 @@ jobs:
   analytics-tests:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: Merchant_X_Consumer
+
     services:
       postgres:
         image: postgres:15
@@ -42,23 +46,25 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      
-      - name: Debug working directory
+
+      - name: Debug paths
         run: |
           pwd
           ls -la
-
+          echo "---- repo root ----"
+          ls -la ..
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest pytest-django
-    
+
       - name: Run migrations
         run: |
-            python manage.py migrate --noinput
+          python manage.py migrate --noinput
 
       - name: Run analytics tests only
         run: |
-          pytest store/analytics/services/tests -v
+          pytest ../store/analytics/services/tests -v
+
