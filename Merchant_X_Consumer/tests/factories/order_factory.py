@@ -17,6 +17,14 @@ class OrderFactory(factory.django.DjangoModelFactory):
     status = Order.StatusChoices.PENDING
     total_amount = Decimal("0.00")
 
+    @factory.post_generation
+    def set_created_at(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            Order.objects.filter(pk=self.pk).update(created_at=extracted)
+            self.refresh_from_db()
+
 
 class OrderItemFactory(factory.django.DjangoModelFactory):
     class Meta:
