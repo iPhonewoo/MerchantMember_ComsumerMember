@@ -1,4 +1,5 @@
 Merchant X Consumer API
+
   一個「多商家 x 會員」的電商後端 API 專案，使用 Django + Django REST Framework 實作，
   以實際商業系統為設計目標，完整涵蓋：
 
